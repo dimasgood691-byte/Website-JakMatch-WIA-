@@ -1,16 +1,20 @@
 package main
 
 import (
-    "net/http"
-    "github.com/labstack/echo/v4"
+	"net/http"
+	"jakmatch-backend/config"
+	"github.com/labstack/echo/v4"
 )
 
 func main() {
-    e := echo.New()
-    
-    e.GET("/", func(c echo.Context) error {
-        return c.String(http.StatusOK, "Backend JakMatch siap mengudara!")
-    })
-    
-    e.Logger.Fatal(e.Start(":8080"))
+	// Inisiasi database
+	config.ConnectDB()
+
+	e := echo.New()
+	
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Backend JakMatch berjalan dengan Database Terkoneksi!")
+	})
+	
+	e.Logger.Fatal(e.Start(":8080"))
 }
