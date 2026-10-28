@@ -1,4 +1,103 @@
+'use client';
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+
+// Data Wilayah Jakarta dengan struktur metrik yang lebih bersih & objektif
+const JAKARTA_REGIONS = [
+  {
+    id: "jakut",
+    index: "01",
+    code: "ID-JK-UTR",
+    name: "Jakarta Utara",
+    area: "146,66 km²",
+    summary:
+      "Kawasan pesisir dengan perkembangan infrastruktur mandiri yang pesat. Didominasi hunian vertikal modern, pusat kuliner, dan akses langsung menuju jalur tol lingkar luar.",
+    avgRent: "Rp 2,5 Jt – 6,0 Jt",
+    metrics: [
+      { label: "Aksesibilitas & Tol", score: 88 },
+      { label: "Fasilitas Gaya Hidup", score: 90 },
+      { label: "Kenyamanan Lingkungan", score: 82 },
+    ],
+    districts: ["Kelapa Gading", "Penjaringan (PIK)", "Sunter", "Pademangan"],
+    points: "135,130 165,118 260,165 370,180 415,155 500,195 620,165 700,145 820,160 940,128 945,300 885,315 845,290 795,318 660,310 575,280 550,235 505,265 475,245 410,240 410,285 350,285 250,260 165,200",
+    labelPos: { x: 580, y: 225 },
+  },
+  {
+    id: "jakbar",
+    index: "02",
+    code: "ID-JK-BRT",
+    name: "Jakarta Barat",
+    area: "129,54 km²",
+    summary:
+      "Titik temu kawasan pendidikan tinggi, pusat komersial, dan pemukiman padat yang hidup. Sangat ideal bagi mahasiswa maupun pekerja dengan mobilitas tinggi ke arah bandara.",
+    avgRent: "Rp 1,8 Jt – 4,5 Jt",
+    metrics: [
+      { label: "Aksesibilitas & Tol", score: 86 },
+      { label: "Fasilitas Gaya Hidup", score: 85 },
+      { label: "Kenyamanan Lingkungan", score: 78 },
+    ],
+    districts: ["Kebon Jeruk", "Grogol Petamburan", "Kembangan", "Tanjung Duren"],
+    points: "60,145 135,130 165,200 250,260 350,285 410,285 410,240 475,245 495,300 400,308 440,360 435,405 380,435 382,480 335,480 335,498 150,490 165,410 138,410 140,355 60,325",
+    labelPos: { x: 265, y: 365 },
+  },
+  {
+    id: "jakpus",
+    index: "03",
+    code: "ID-JK-PST",
+    name: "Jakarta Pusat",
+    area: "48,13 km²",
+    summary:
+      "Simpul utama transportasi publik (MRT, KRL, LRT, TransJakarta) dan pusat pemerintahan. Menawarkan efisiensi waktu tempuh terbaik bagi pekerja di kawasan bisnis utama.",
+    avgRent: "Rp 2,8 Jt – 7,5 Jt",
+    metrics: [
+      { label: "Aksesibilitas & Tol", score: 98 },
+      { label: "Fasilitas Gaya Hidup", score: 94 },
+      { label: "Kenyamanan Lingkungan", score: 85 },
+    ],
+    districts: ["Menteng", "Tanah Abang", "Kemayoran", "Cempaka Putih"],
+    points: "475,245 505,265 550,235 575,280 660,310 640,355 650,405 595,430 570,462 470,435 380,435 435,405 440,360 400,308 495,300",
+    labelPos: { x: 525, y: 365 },
+  },
+  {
+    id: "jaksel",
+    index: "04",
+    code: "ID-JK-SLT",
+    name: "Jakarta Selatan",
+    area: "141,27 km²",
+    summary:
+      "Perpaduan distrik bisnis modern (SCBD), ruang terbuka hijau yang teduh, serta pusat tren kreatif. Pilihan utama untuk keseimbangan antara karier dan kualitas tempat tinggal.",
+    avgRent: "Rp 2,5 Jt – 6,5 Jt",
+    metrics: [
+      { label: "Aksesibilitas & Tol", score: 92 },
+      { label: "Fasilitas Gaya Hidup", score: 96 },
+      { label: "Kenyamanan Lingkungan", score: 90 },
+    ],
+    districts: ["Kebayoran Baru", "Tebet", "Cilandak", "Setiabudi"],
+    points: "225,492 335,498 335,480 382,480 380,435 470,435 570,462 605,490 590,560 608,600 555,650 585,705 528,735 525,775 385,815 425,695 330,695 305,625 265,595 255,520",
+    labelPos: { x: 435, y: 590 },
+  },
+  {
+    id: "jaktim",
+    index: "05",
+    code: "ID-JK-TMR",
+    name: "Jakarta Timur",
+    area: "188,03 km²",
+    summary:
+      "Wilayah dengan rasio ruang keluarga terluas dan biaya hidup yang paling rasional. Kini semakin terkoneksi berkat kehadiran jalur LRT Jabodebek dan koridor TransJakarta.",
+    avgRent: "Rp 1,2 Jt – 3,5 Jt",
+    metrics: [
+      { label: "Aksesibilitas & Tol", score: 85 },
+      { label: "Fasilitas Gaya Hidup", score: 80 },
+      { label: "Kenyamanan Lingkungan", score: 88 },
+    ],
+    districts: ["Kramat Jati", "Duren Sawit", "Rawamangun", "Cipayung"],
+    points: "660,310 795,318 845,290 885,315 945,300 945,400 915,485 860,495 820,550 735,555 765,620 790,725 768,805 680,838 585,765 525,775 528,735 585,705 555,650 608,600 590,560 605,490 570,462 595,430 650,405 640,355",
+    labelPos: { x: 740, y: 480 },
+  },
+];
 
 // Konfigurasi terpusat Animate On Scroll (AOS) agar kode bersih & konsisten
 type AosDirection = "up" | "down" | "left" | "right" | "zoom";
@@ -59,7 +158,7 @@ export default function Home() {
       >
         <div className="flex items-center gap-2">
           <Image src="/assets/logo.png" alt="Logo Jakmatch" width={36} height={36} className="object-contain drop-shadow-md" />
-          <span className="text-xl font-semibold text-white tracking-wide drop-shadow-md">JakMatch</span>
+          <span className="text-xl font-semibold text-white tracking-wide drop-shadow-md">Jakmatch</span>
         </div>
 
         <div className="hidden md:flex items-center bg-[#E5E5E5] rounded-full p-1.5 shadow-sm">
