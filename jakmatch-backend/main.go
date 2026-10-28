@@ -24,7 +24,13 @@ func main() {
 	config.ConnectDB()
 
 	// 3. Jalankan Seeder Data Awal
+<<<<<<< HEAD
 	seeders.SeedDatabase()
+=======
+	if err := seeders.SeedDatabase(); err != nil {
+		log.Fatalf("Gagal menjalankan seeder: %v", err)
+	}
+>>>>>>> landingpage
 
 	// 4. Inisialisasi Echo & Middleware CORS
 	e := echo.New()
