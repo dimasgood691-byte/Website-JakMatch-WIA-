@@ -1,4 +1,4 @@
-# JAKMATCH (Jakarta Matching)
+# JakMatch (Jakarta Matching)
 
 JakMatch adalah platform web data-driven yang dirancang untuk membantu warga DKI Jakarta dan pelaku UMKM dalam memilih lokasi huni atau area bisnis secara presisi. Platform ini mengintegrasikan statistik kecamatan, filter wilayah, kalkulator anggaran mandiri, grafik radar komparatif, serta analisis berbasis kecerdasan buatan (*Generative AI*).
 
@@ -74,3 +74,9 @@ cd jakmatch-frontend
 npm install
 npm run dev
 ```
+
+## Progres saat ini
+* ✅ Instalasi project (Frontend & Backend).
+* ✅ Desain skema database PostgreSQL menggunakan GORM dan migrasi tabel.
+* ✅ Implementasi Landing Page utama yang interaktif dan responsif menggunakan Next.js.
+* 🔄 Sedang dalam tahap pengembangan integrasi endpoint API backend Echo dengan frontend.
