@@ -99,6 +99,29 @@ const JAKARTA_REGIONS = [
   },
 ];
 
+// Konfigurasi terpusat Animate On Scroll (AOS) agar kode bersih & konsisten
+type AosDirection = "up" | "down" | "left" | "right" | "zoom";
+
+const SMOOTH_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const AOS_VIEWPORT = { once: false, amount: 0.25 } as const;
+
+const createAos = (direction: AosDirection, delay = 0, duration = 0.85) => {
+  const initialOffsets: Record<AosDirection, Record<string, number>> = {
+    up: { opacity: 0, y: 40 },
+    down: { opacity: 0, y: -40 },
+    left: { opacity: 0, x: -80 },
+    right: { opacity: 0, x: 80 },
+    zoom: { opacity: 0, y: 48, scale: 0.95 },
+  };
+
+  return {
+    initial: initialOffsets[direction],
+    whileInView: { opacity: 1, x: 0, y: 0, scale: 1 },
+    viewport: AOS_VIEWPORT,
+    transition: { duration, delay, ease: SMOOTH_EASE },
+  };
+};
+
 export default function Home() {
   const [isScrolling, setIsScrolling] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState(JAKARTA_REGIONS[3]);
@@ -115,7 +138,7 @@ export default function Home() {
       }, 300);
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", handleScroll);
       clearTimeout(scrollTimeout);
@@ -124,28 +147,28 @@ export default function Home() {
 
   return (
     <main className="relative w-full flex flex-col font-sans overflow-x-hidden">
-      
+
       {/* ========================================= */}
       {/* SMART NAVBAR (Tanpa Efek Blur / Background) */}
       {/* ========================================= */}
-      <nav 
+      <nav
         className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-8 py-6 bg-transparent transition-transform duration-300 ease-in-out ${
           isScrolling ? "-translate-y-full" : "translate-y-0"
         }`}
       >
         <div className="flex items-center gap-2">
-          <Image src="/images/logo.png" alt="Logo Jakmatch" width={36} height={36} className="object-contain drop-shadow-md"/>
+          <Image src="/assets/logo.png" alt="Logo Jakmatch" width={36} height={36} className="object-contain drop-shadow-md" />
           <span className="text-xl font-semibold text-white tracking-wide drop-shadow-md">Jakmatch</span>
         </div>
-        
+
         <div className="hidden md:flex items-center bg-[#E5E5E5] rounded-full p-1.5 shadow-sm">
           <Link href="#" className="bg-black text-white px-5 py-1.5 rounded-full text-xs font-bold tracking-wide">HOME</Link>
           <Link href="#" className="text-gray-900 px-5 py-1.5 rounded-full text-xs font-bold hover:bg-black/5 transition tracking-wide">SERVICES</Link>
           <Link href="#" className="text-gray-900 px-5 py-1.5 rounded-full text-xs font-bold hover:bg-black/5 transition tracking-wide">ABOUTUS</Link>
         </div>
-        
+
         <div className="flex items-center gap-6">
-          <Link href="#" className="text-white text-sm font-medium hover:text-gray-200 transition drop-shadow-md">Log In</Link>
+          <Link href="#" className="relative text-white text-sm font-medium transition drop-shadow-md after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-white hover:after:w-full after:transition-all after:duration-300">Log In</Link>
           <Link href="#" className="bg-black text-white px-6 py-2 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg">Sign up</Link>
         </div>
       </nav>
@@ -153,96 +176,151 @@ export default function Home() {
       {/* ========================================= */}
       {/* SECTION 1: HERO & DASHBOARD               */}
       {/* ========================================= */}
-      <section className="relative min-h-screen w-full flex flex-col">
+      <section className="relative isolate min-h-screen w-full flex flex-col">
         <div className="absolute inset-0 -z-10 bg-black">
           <video autoPlay loop muted playsInline className="h-full w-full object-cover opacity-90">
-            <source src="/images/landing-bg.mp4" type="video/mp4" />
+            <source src="/assets/landing-bg.mp4" type="video/mp4" />
           </video>
+          {/* Gradasi penyatu dari akhir Section 1 menuju warna langit Section 2 */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-b from-transparent via-[#09489c]/65 to-[#0c58b8]" />
         </div>
 
         <div className="flex flex-col items-center justify-center text-center mt-32 md:mt-40 px-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-wide drop-shadow-sm">
+          <motion.h1
+            {...createAos("up", 0)}
+            className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-wide drop-shadow-sm"
+          >
             Live where you feel<br />comfortable.
-          </h1>
-          <p className="text-white max-w-2xl text-base md:text-lg mb-8 font-medium drop-shadow-md">
+          </motion.h1>
+
+          <motion.p
+            {...createAos("up", 0.1)}
+            className="text-white max-w-2xl text-base md:text-lg mb-8 font-medium drop-shadow-md"
+          >
             We provide this platform for those of you who are struggling to find a<br />comfortable place to live.
-          </p>
-          <div className="flex gap-4">
+          </motion.p>
+
+          <motion.div {...createAos("up", 0.2)} className="flex gap-4">
             <Link href="#" className="bg-black text-white px-8 py-3 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg">Sign Up</Link>
             <Link href="#" className="bg-white text-black px-8 py-3 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-lg">Try Free Now</Link>
-          </div>
+          </motion.div>
         </div>
 
-        <div className="flex-1 mt-16 px-6 md:px-12 flex justify-center items-end pb-8">
+        <motion.div
+          {...createAos("zoom", 0.25)}
+          className="relative z-10 flex-1 mt-16 px-6 md:px-12 flex justify-center items-end pb-10"
+        >
           <div className="w-full max-w-6xl bg-white h-[40vh] md:h-[45vh] rounded-3xl shadow-2xl flex items-center justify-center">
             <h2 className="text-3xl font-bold text-black">tampilan dashboard</h2>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ========================================= */}
       {/* SECTION 2: MONAS & ANIMASI JAK-MATCH      */}
       {/* ========================================= */}
-      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 -z-20">
-          <Image src="/images/langit.jpeg" alt="Langit Cerah" fill className="object-cover" />
+      <section
+        aria-label="Jakmatch Showcase"
+        className="relative isolate h-screen w-full overflow-hidden select-none"
+      >
+        {/* Layer 0: Background Langit + Gradasi Transisi Atas & Bawah */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/assets/langit.jpeg"
+            alt="Langit Cerah Jakarta"
+            fill
+            sizes="100vw"
+            className="object-cover object-center pointer-events-none"
+          />
+          {/* Gradasi Atas: Menyambung warna akhir Section 1 (#0c58b8) */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-[#0c58b8] via-[#0c58b8]/45 to-transparent" />
+          {/* Gradasi Bawah: Menyambung warna langit awal Section 3 (#257ce0) */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-52 bg-gradient-to-b from-transparent via-[#5ba4ec]/65 to-[#257ce0]" />
         </div>
 
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 -z-10 w-[400px] h-[85vh] md:w-[650px] md:h-[100vh]">
-          <Image src="/images/monas.png" alt="Monas" fill className="object-contain object-bottom" />
-        </div>
-
-        <div className="relative w-full max-w-[1400px] mx-auto h-full">
-          <motion.h1 
-            initial={{ opacity: 0, x: -100 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false, amount: 0.5 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="absolute left-8 md:left-32 top-[35%] text-[80px] md:text-[140px] font-black text-black tracking-widest drop-shadow-xl"
-            style={{ fontFamily: "monospace" }}
+        {/* Container Komposisi Utama */}
+        <h2
+          aria-label="JAKMATCH"
+          className="relative mx-auto h-full w-full max-w-7xl px-6 md:px-16"
+        >
+          {/* Layer 10 (Di Belakang Monas): Teks "JAK" */}
+          <motion.span
+            {...createAos("left", 0, 0.95)}
+            className="
+              absolute left-6 sm:left-12 lg:left-24 top-[30%] md:top-[32%] z-10
+              font-mono font-black text-black leading-none
+              text-[clamp(3.75rem,11vw,9rem)] tracking-[0.12em]
+              drop-shadow-[0_12px_24px_rgba(0,0,0,0.2)]
+            "
           >
             JAK
-          </motion.h1>
+          </motion.span>
 
-          <motion.h1 
-            initial={{ opacity: 0, x: 100 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false, amount: 0.5 }}
-            transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-            className="absolute right-4 md:right-8 bottom-[25%] text-[80px] md:text-[140px] font-black text-black tracking-widest drop-shadow-xl"
-            style={{ fontFamily: "monospace" }}
+          {/* Layer 20 (Tengah): Monumen Nasional dengan mask halus di bagian kaki */}
+          <motion.div
+            {...createAos("zoom", 0.05, 1)}
+            className="
+              pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 z-20
+              h-[82vh] w-[360px] sm:w-[480px] md:h-[96vh] md:w-[640px]
+              [mask-image:linear-gradient(to_bottom,black_80%,transparent_99%)]
+            "
+          >
+            <Image
+              src="/assets/monas.png"
+              alt="Monumen Nasional"
+              fill
+              sizes="(max-width: 768px) 480px, 640px"
+              className="object-contain object-bottom drop-shadow-[0_20px_40px_rgba(0,0,0,0.28)]"
+            />
+          </motion.div>
+
+          {/* Layer 30 (Di Depan Monas): Teks "MATCH" */}
+          <motion.span
+            {...createAos("right", 0.15, 0.95)}
+            className="
+              absolute right-6 sm:right-12 lg:right-20 bottom-[22%] md:bottom-[24%] z-30
+              font-mono font-black text-black leading-none
+              text-[clamp(3.75rem,11vw,9rem)] tracking-[0.12em]
+              drop-shadow-[0_12px_24px_rgba(0,0,0,0.22)]
+            "
           >
             MATCH
-          </motion.h1>
-        </div>
+          </motion.span>
+        </h2>
       </section>
 
       {/* ========================================= */}
       {/* SECTION 3: INTERACTIVE MAP (COMPACT CARD) */}
       {/* ========================================= */}
-      <section className="relative min-h-screen w-full flex items-center justify-center pt-28 pb-12 px-6 md:px-16 overflow-hidden">
-        
-        {/* Background Padang Rumput & Langit */}
+      <section className="relative isolate min-h-screen w-full flex items-center justify-center pt-28 pb-12 px-6 md:px-16 overflow-hidden">
+
+        {/* Background Padang Rumput & Langit + Gradasi Penyatu dari Section 2 */}
         <div className="absolute inset-0 -z-20">
           <Image
-            src="/images/landing-bg2.jpeg" // Sesuaikan jika ekstensi file lu .jpg / .jpeg
+            src="/assets/landing-bg2.jpeg"
             alt="Background Peta Jakarta"
             fill
-            className="object-cover object-center"
+            sizes="100vw"
+            className="object-cover object-center pointer-events-none"
           />
+          {/* Gradasi Atas: Menyambung warna langit bawah Section 2 (#257ce0) */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-52 bg-gradient-to-b from-[#257ce0] via-[#257ce0]/50 to-transparent" />
         </div>
 
         <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center z-10">
-          
+
           {/* KIRI: PETA INTERAKTIF & FILTER CEPAT (7 Kolom) */}
-          <div className="lg:col-span-7 flex flex-col items-center">
-            
-            {/* Kanvas Peta (Diperkecil sedikit agar seimbang dengan Card) */}
+          <motion.div
+            {...createAos("left", 0)}
+            className="lg:col-span-7 flex flex-col items-center"
+          >
+            {/* Kanvas Peta */}
             <div className="relative w-full max-w-[450px] aspect-square select-none">
               <Image
-                src="/images/peta-jakarta.png"
+                src="/assets/peta-jakarta.png"
                 alt="Peta DKI Jakarta"
                 fill
+                sizes="(max-width: 768px) 100vw, 450px"
                 className="object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.25)] pointer-events-none"
               />
 
@@ -268,8 +346,8 @@ export default function Home() {
                           isSelected
                             ? "rgba(249, 115, 22, 0.85)"
                             : isHovered
-                            ? "rgba(37, 99, 235, 0.70)"
-                            : "rgba(255, 255, 255, 0.01)"
+                              ? "rgba(37, 99, 235, 0.70)"
+                              : "rgba(255, 255, 255, 0.01)"
                         }
                         stroke={
                           isSelected || isHovered
@@ -317,10 +395,13 @@ export default function Home() {
                 );
               })}
             </div>
-          </div>
+          </motion.div>
 
           {/* KANAN: PANEL DESKRIPSI COMPACT (5 Kolom) */}
-          <div className="lg:col-span-5 flex justify-center lg:justify-end">
+          <motion.div
+            {...createAos("right", 0.15)}
+            className="lg:col-span-5 flex justify-center lg:justify-end"
+          >
             <AnimatePresence mode="wait">
               <motion.div
                 key={selectedRegion.id}
@@ -402,7 +483,7 @@ export default function Home() {
                 </div>
               </motion.div>
             </AnimatePresence>
-          </div>
+          </motion.div>
 
         </div>
       </section>
