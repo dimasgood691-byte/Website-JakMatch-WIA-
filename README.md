@@ -79,4 +79,4 @@ npm run dev
 * ✅ Instalasi project (Frontend & Backend).
 * ✅ Desain skema database PostgreSQL menggunakan GORM dan migrasi tabel.
 * ✅ Implementasi Landing Page utama yang interaktif dan responsif menggunakan Next.js.
-* 🔄 Sedang dalam tahap pengembangan integrasi endpoint API backend Echo dengan frontend.
+* ✅ Intregrasi endpoint api register dan login.

@@ -152,9 +152,8 @@ export default function Home() {
       {/* SMART NAVBAR (Tanpa Efek Blur / Background) */}
       {/* ========================================= */}
       <nav
-        className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-8 py-6 bg-transparent transition-transform duration-300 ease-in-out ${
-          isScrolling ? "-translate-y-full" : "translate-y-0"
-        }`}
+        className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6 bg-transparent transition-transform duration-300 ease-in-out ${isScrolling ? "-translate-y-full" : "translate-y-0"
+          }`}
       >
         <div className="flex items-center gap-2">
           <Image src="/assets/logo.png" alt="Logo Jakmatch" width={36} height={36} className="object-contain drop-shadow-md" />
@@ -167,9 +166,9 @@ export default function Home() {
           <Link href="#" className="text-gray-900 px-5 py-1.5 rounded-full text-xs font-bold hover:bg-black/5 transition tracking-wide">ABOUTUS</Link>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3 sm:gap-6">
           <Link href="#" className="relative text-white text-sm font-medium transition drop-shadow-md after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-white hover:after:w-full after:transition-all after:duration-300">Log In</Link>
-          <Link href="#" className="bg-black text-white px-6 py-2 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg">Sign up</Link>
+          <Link href="#" className="bg-black text-white px-4 sm:px-6 py-2 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg">Sign up</Link>
         </div>
       </nav>
 
@@ -185,22 +184,22 @@ export default function Home() {
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-b from-transparent via-[#09489c]/65 to-[#0c58b8]" />
         </div>
 
-        <div className="flex flex-col items-center justify-center text-center mt-32 md:mt-40 px-4">
+        <div className="flex flex-col items-center justify-center text-center mt-28 sm:mt-32 lg:mt-36 px-4">
           <motion.h1
             {...createAos("up", 0)}
-            className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-wide drop-shadow-sm"
+            className="text-[clamp(2rem,4vw,3.75rem)] leading-[1.05] font-bold text-white mb-5 sm:mb-6 tracking-wide drop-shadow-sm"
           >
-            Live where you feel<br />comfortable.
+            Live where you feel<br className="hidden sm:block" /> comfortable.
           </motion.h1>
 
           <motion.p
             {...createAos("up", 0.1)}
-            className="text-white max-w-2xl text-base md:text-lg mb-8 font-medium drop-shadow-md"
+            className="text-white max-w-2xl text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 font-medium drop-shadow-md"
           >
-            We provide this platform for those of you who are struggling to find a<br />comfortable place to live.
+            We provide this platform for those of you who are struggling to find a comfortable place to live.
           </motion.p>
 
-          <motion.div {...createAos("up", 0.2)} className="flex gap-4">
+          <motion.div {...createAos("up", 0.2)} className="flex flex-wrap justify-center gap-3 sm:gap-4">
             <Link href="#" className="bg-black text-white px-8 py-3 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg">Sign Up</Link>
             <Link href="#" className="bg-white text-black px-8 py-3 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-lg">Try Free Now</Link>
           </motion.div>
@@ -208,10 +207,10 @@ export default function Home() {
 
         <motion.div
           {...createAos("zoom", 0.25)}
-          className="relative z-10 flex-1 mt-16 px-6 md:px-12 flex justify-center items-end pb-10"
+          className="relative z-10 flex-1 mt-12 sm:mt-14 lg:mt-12 px-4 sm:px-6 lg:px-12 flex justify-center items-end pb-12 sm:pb-16 lg:pb-24"
         >
-          <div className="w-full max-w-6xl bg-white h-[40vh] md:h-[45vh] rounded-3xl shadow-2xl flex items-center justify-center">
-            <h2 className="text-3xl font-bold text-black">tampilan dashboard</h2>
+          <div className="w-full max-w-6xl h-[clamp(17rem,45vh,28rem)] rounded-2xl sm:rounded-3xl bg-white p-5 sm:p-8 shadow-2xl flex items-center justify-center">
+            <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] text-center font-bold text-black">tampilan dashboard</h2>
           </div>
         </motion.div>
       </section>
@@ -247,9 +246,9 @@ export default function Home() {
           <motion.span
             {...createAos("left", 0, 0.95)}
             className="
-              absolute left-6 sm:left-12 lg:left-24 top-[30%] md:top-[32%] z-10
+              absolute left-4 sm:left-10 lg:left-20 top-[34%] md:top-[36%] z-10
               font-mono font-black text-black leading-none
-              text-[clamp(3.75rem,11vw,9rem)] tracking-[0.12em]
+              text-[clamp(2rem,8vw,7rem)] tracking-[0.04em] sm:tracking-[0.1em]
               drop-shadow-[0_12px_24px_rgba(0,0,0,0.2)]
             "
           >
@@ -274,13 +273,13 @@ export default function Home() {
             />
           </motion.div>
 
-          {/* Layer 30 (Di Depan Monas): Teks "MATCH" */}
+          {/* Teks tetap di belakang Monas agar tidak menutupi gambar */}
           <motion.span
             {...createAos("right", 0.15, 0.95)}
             className="
-              absolute right-6 sm:right-12 lg:right-20 bottom-[22%] md:bottom-[24%] z-30
+              absolute right-4 sm:right-10 lg:right-20 bottom-[26%] md:bottom-[28%] z-10
               font-mono font-black text-black leading-none
-              text-[clamp(3.75rem,11vw,9rem)] tracking-[0.12em]
+              text-[clamp(2rem,8vw,7rem)] tracking-[0.04em] sm:tracking-[0.1em]
               drop-shadow-[0_12px_24px_rgba(0,0,0,0.22)]
             "
           >
@@ -292,7 +291,7 @@ export default function Home() {
       {/* ========================================= */}
       {/* SECTION 3: INTERACTIVE MAP (COMPACT CARD) */}
       {/* ========================================= */}
-      <section className="relative isolate min-h-screen w-full flex items-center justify-center pt-28 pb-12 px-6 md:px-16 overflow-hidden">
+      <section className="relative isolate min-h-screen w-full flex items-center justify-center pt-24 sm:pt-28 pb-10 sm:pb-12 px-4 sm:px-6 lg:px-12 xl:px-16 overflow-hidden">
 
         {/* Background Padang Rumput & Langit + Gradasi Penyatu dari Section 2 */}
         <div className="absolute inset-0 -z-20">
@@ -307,7 +306,7 @@ export default function Home() {
           <div className="pointer-events-none absolute inset-x-0 top-0 h-52 bg-gradient-to-b from-[#257ce0] via-[#257ce0]/50 to-transparent" />
         </div>
 
-        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center z-10">
+        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 xl:gap-12 items-center z-10">
 
           {/* KIRI: PETA INTERAKTIF & FILTER CEPAT (7 Kolom) */}
           <motion.div
@@ -315,7 +314,7 @@ export default function Home() {
             className="lg:col-span-7 flex flex-col items-center"
           >
             {/* Kanvas Peta */}
-            <div className="relative w-full max-w-[450px] aspect-square select-none">
+            <div className="relative w-full max-w-[450px] lg:max-w-[520px] xl:max-w-[600px] aspect-square select-none">
               <Image
                 src="/assets/peta-jakarta.png"
                 alt="Peta DKI Jakarta"
@@ -362,11 +361,10 @@ export default function Home() {
                         x={region.labelPos.x}
                         y={region.labelPos.y}
                         textAnchor="middle"
-                        className={`text-[21px] font-bold tracking-tight pointer-events-none transition-colors duration-200 ${
-                          isSelected || isHovered
+                        className={`text-[21px] font-bold tracking-tight pointer-events-none transition-colors duration-200 ${isSelected || isHovered
                             ? "fill-white"
                             : "fill-neutral-800/80"
-                        }`}
+                          }`}
                       >
                         {region.name.replace("Jakarta ", "Jak. ")}
                       </text>
@@ -384,11 +382,10 @@ export default function Home() {
                   <button
                     key={region.id}
                     onClick={() => setSelectedRegion(region)}
-                    className={`px-3.5 py-1 rounded-full text-[11px] font-bold tracking-wide transition-all ${
-                      active
+                    className={`px-3.5 py-1 rounded-full text-[11px] font-bold tracking-wide transition-all ${active
                         ? "bg-black text-white shadow-sm"
                         : "text-neutral-700 hover:bg-black/5"
-                    }`}
+                      }`}
                   >
                     {region.name.replace("Jakarta ", "")}
                   </button>
@@ -409,7 +406,7 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.25, ease: "easeOut" }}
-                className="w-full max-w-[400px] bg-white rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.18)] text-black"
+                className="w-full max-w-[400px] lg:max-w-[460px] xl:max-w-[520px] bg-white rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.18)] text-black"
               >
                 {/* Meta Bar Atas */}
                 <div className="flex items-center justify-between text-[11px] font-mono text-neutral-400 pb-2.5 border-b border-neutral-100">
