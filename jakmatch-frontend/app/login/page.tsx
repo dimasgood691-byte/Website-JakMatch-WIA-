@@ -40,7 +40,7 @@ export default function LoginPage() {
 
       {/* 2. HEADER LOGO JAKMATCH (Kiri Atas - Klik untuk kembali ke Home) */}
       <header className="fixed top-0 left-0 w-full px-6 sm:px-10 py-6 z-20">
-        <Link href="/" className="inline-flex items-center gap-2.5 group">
+        <Link href="/" className="flex items-center gap-2">
           <Image
             src="/assets/logo.png"
             alt="Logo Jakmatch"
@@ -48,7 +48,7 @@ export default function LoginPage() {
             height={36}
             className="object-contain transition-transform duration-300 group-hover:scale-105"
           />
-          <span className="text-xl font-semibold text-[#1E1E24] tracking-tight">
+          <span className="text-xl font-semibold text-white tracking-wide drop-shadow-md">
             Jakmatch
           </span>
         </Link>

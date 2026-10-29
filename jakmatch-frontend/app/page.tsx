@@ -168,7 +168,7 @@ export default function Home() {
 
         <div className="flex items-center gap-3 sm:gap-6">
           <Link href="/login" className="relative text-white text-sm font-medium transition drop-shadow-md after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-white hover:after:w-full after:transition-all after:duration-300">Log In</Link>
-          <Link href="#" className="bg-black text-white px-4 sm:px-6 py-2 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg">Sign up</Link>
+          <Link href="/register" className="bg-black text-white px-4 sm:px-6 py-2 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg">Sign up</Link>
         </div>
       </nav>
 
@@ -200,7 +200,7 @@ export default function Home() {
           </motion.p>
 
           <motion.div {...createAos("up", 0.2)} className="flex flex-wrap justify-center gap-3 sm:gap-4">
-            <Link href="#" className="bg-black text-white px-8 py-3 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg">Sign Up</Link>
+            <Link href="/register" className="bg-black text-white px-8 py-3 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg">Sign Up</Link>
             <Link href="#" className="bg-white text-black px-8 py-3 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-lg">Try Free Now</Link>
           </motion.div>
         </div>
