@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -136,6 +136,7 @@ export default function Home() {
   const [isScrolling, setIsScrolling] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState(JAKARTA_REGIONS[3]);
   const [hoveredRegionId, setHoveredRegionId] = useState<string | null>(null);
+  const mainRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let scrollTimeout: NodeJS.Timeout;
@@ -148,15 +149,20 @@ export default function Home() {
       }, 300);
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    const el = mainRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      el.removeEventListener("scroll", handleScroll);
       clearTimeout(scrollTimeout);
     };
   }, []);
 
   return (
-    <main className="relative w-full flex flex-col font-sans overflow-x-hidden">
+    <main
+      ref={mainRef}
+      className="relative w-full flex flex-col font-sans overflow-x-hidden h-screen overflow-y-scroll snap-y snap-mandatory snap-container"
+    >
       {/* ========================================= */}
       {/* SMART NAVBAR (Tanpa Efek Blur / Background) */}
       {/* ========================================= */}
@@ -173,9 +179,10 @@ export default function Home() {
             height={36}
             className="object-contain drop-shadow-md"
           />
-          <span className="text-xl font-semibold text-white tracking-wide drop-shadow-md">
-            Jakmatch
-          </span>
+          <div className="flex items-center font-semibold tracking-wide drop-shadow-md">
+            <div className="text-xl text-[#297add]">Jak</div>
+            <div className="text-xl text-white">Match</div>
+          </div>
         </div>
 
         <div className="hidden md:flex items-center bg-[#E5E5E5] rounded-full p-1.5 shadow-sm">
@@ -218,7 +225,7 @@ export default function Home() {
       {/* ========================================= */}
       {/* SECTION 1: HERO & DASHBOARD               */}
       {/* ========================================= */}
-      <section className="relative isolate min-h-screen w-full flex flex-col">
+      <section className="relative isolate h-screen w-full flex flex-col shrink-0 snap-start">
         <div className="absolute inset-0 -z-10 bg-black">
           <video
             autoPlay
@@ -286,21 +293,22 @@ export default function Home() {
       {/* ========================================= */}
       <section
         aria-label="Jakmatch Showcase"
-        className="relative isolate h-screen w-full overflow-hidden select-none"
+        className="relative isolate h-screen w-full overflow-hidden select-none shrink-0 snap-start"
       >
-        {/* Layer 0: Background Langit + Gradasi Transisi Atas & Bawah */}
+        {/* Layer 0: Background Langit + Overlay kontras agar teks estetik & readable */}
         <div className="absolute inset-0 z-0">
-          <Image
-            src="/assets/langit.jpeg"
-            alt="Langit Cerah Jakarta"
-            fill
-            sizes="100vw"
-            className="object-cover object-center pointer-events-none"
-          />
-          {/* Gradasi Atas: Menyambung warna akhir Section 1 (#0c58b8) */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-[#0c58b8] via-[#0c58b8]/45 to-transparent" />
-          {/* Gradasi Bawah: Menyambung warna langit awal Section 3 (#257ce0) */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-52 bg-gradient-to-b from-transparent via-[#5ba4ec]/65 to-[#257ce0]" />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="h-full w-full object-cover"
+          >
+            <source src="/assets/langit.mp4" type="video/mp4" />
+          </video>
+          {/* Gradasi halus di atas & bawah untuk kedalaman & kontras teks */}
+          <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
+          <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/35 via-transparent to-black/45" />
         </div>
 
         {/* Container Komposisi Utama */}
@@ -308,45 +316,62 @@ export default function Home() {
           aria-label="JAKMATCH"
           className="relative mx-auto h-full w-full max-w-7xl px-6 md:px-16"
         >
-          {/* Layer 10 (Di Belakang Monas): Teks "JAK" */}
+          {/* Layer 20: Teks "JAK" (kiri atas, bingkai Monas) */}
           <motion.span
-            {...createAos("left", 0, 0.95)}
+            {...createAos("left", 0, 0.9)}
             className="
-              absolute left-4 sm:left-10 lg:left-20 top-[34%] md:top-[36%] z-10
-              font-mono font-black text-black leading-none
-              text-[clamp(2rem,8vw,7rem)] tracking-[0.04em] sm:tracking-[0.1em]
-              drop-shadow-[0_12px_24px_rgba(0,0,0,0.2)]
+            absolute top-1/4 sm:top-[28%] left-6 sm:left-10 lg:left-20 z-20
+            font-mono font-black text-[#297add] leading-none
+            text-[clamp(1.75rem,7vw,5.5rem)] tracking-[0.05em] sm:tracking-[0.12em]
+            drop-shadow-[0_10px_20px_rgba(0,0,0,0.55)]
+            select-none
             "
           >
             JAK
           </motion.span>
 
-          {/* Layer 20 (Tengah): Monumen Nasional dengan mask halus di bagian kaki */}
+          {/* Glow halus di belakang Monas untuk efek estetik & kedalangan */}
+          <div
+            {...createAos("zoom", 0.05, 1)}
+            className="
+              pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 z-25
+              h-[70vh] sm:h-[80vh] w-[520px] sm:w-[640px] md:w-[820px]
+              max-w-[90vw]
+              bg-[radial-gradient(circle_at_center,_rgba(255,215,0,0.18)_0%,transparent_70%)]
+              blur-[40px]
+              filter:brightness(1.1)
+            "
+          />
+
+          {/* Layer 30: Monumen Nasional (pusat, dominan, tak dipotong mask) */}
           <motion.div
             {...createAos("zoom", 0.05, 1)}
             className="
-              pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 z-20
-              h-[82vh] w-[360px] sm:w-[480px] md:h-[96vh] md:w-[640px]
-              [mask-image:linear-gradient(to_bottom,black_80%,transparent_99%)]
+              pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 z-30
+              h-[90vh] sm:h-[96vh] md:h-[100vh]
+              w-[360px] sm:w-[500px] md:w-[760px] lg:w-[900px]
+              max-w-[92vw]
+              filter: drop-shadow-[0_28px_56px_rgba(0,0,0,0.5)]
             "
           >
             <Image
               src="/assets/monas.png"
               alt="Monumen Nasional"
               fill
-              sizes="(max-width: 768px) 480px, 640px"
-              className="object-contain object-bottom drop-shadow-[0_20px_40px_rgba(0,0,0,0.28)]"
+              sizes="(max-width: 768px) 500px, (max-width: 1024px) 760px, 900px"
+              className="object-contain object-bottom"
             />
           </motion.div>
 
-          {/* Teks tetap di belakang Monas agar tidak menutupi gambar */}
+          {/* Layer 20: Teks "MATCH" (kanan bawah, bingkai Monas) */}
           <motion.span
-            {...createAos("right", 0.15, 0.95)}
+            {...createAos("right", 0.15, 0.9)}
             className="
-              absolute right-4 sm:right-10 lg:right-20 bottom-[26%] md:bottom-[28%] z-10
-              font-mono font-black text-black leading-none
-              text-[clamp(2rem,8vw,7rem)] tracking-[0.04em] sm:tracking-[0.1em]
-              drop-shadow-[0_12px_24px_rgba(0,0,0,0.22)]
+              absolute bottom-1/4 sm:bottom-[30%] right-6 sm:right-10 lg:right-20 z-20
+              font-mono font-black text-white leading-none
+              text-[clamp(1.75rem,7vw,5.5rem)] tracking-[0.05em] sm:tracking-[0.12em]
+              drop-shadow-[0_10px_20px_rgba(0,0,0,0.55)]
+              select-none
             "
           >
             MATCH
@@ -357,7 +382,7 @@ export default function Home() {
       {/* ========================================= */}
       {/* SECTION 3: INTERACTIVE MAP (COMPACT CARD) */}
       {/* ========================================= */}
-      <section className="relative isolate min-h-screen w-full flex items-center justify-center pt-24 sm:pt-28 pb-10 sm:pb-12 px-4 sm:px-6 lg:px-12 xl:px-16 overflow-hidden">
+      <section className="relative isolate h-screen w-full flex items-center justify-center pt-24 sm:pt-28 pb-10 sm:pb-12 px-4 sm:px-6 lg:px-12 xl:px-16 overflow-hidden shrink-0 snap-start">
         {/* Background Padang Rumput & Langit + Gradasi Penyatu dari Section 2 */}
         <div className="absolute inset-0 -z-20">
           <Image
