@@ -63,10 +63,18 @@ Buat File bernama .env di folder jakmatch-backend yang berisikan :
 - DB_HOST=localhost
 - DB_PORT=5432
 - DB_USER=postgres
-- DB_PASSWORD=#disesuaikan dengan password database yang telah dibuat.
+- DB_PASSWORD=disesuaikan dengan password database yang telah dibuat.
 - DB_NAME=jakmatch_db
 - DB_SSLMODE=disable
 - PORT=8080
+- JWT_SECRET=menyesuaikan
+- FIREBASE_CREDENTIALS_PATH=serviceAccountKey.json
+- APP_BASE_URL=http://localhost:3000
+- SMTP_HOST=smtp.gmail.com
+- SMTP_PORT=465
+- SMTP_USERNAME=gmail pengirim
+- MTP_PASSWORD=app-password-gmail
+- SMTP_FROM="JakMatch <alat-pengirim@gmail.com>"
 
 ```bash
 cd jakmatch-backend
@@ -78,6 +86,16 @@ go run cmd/server/main.go
 
 ### 5. Run Frontend
 
+Buat File bernama .env.local di folder jakmatch-backend yang berisikan :
+- NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
+- NEXT_PUBLIC_FIREBASE_API_KEY=isi_api_key_firebase_kamu
+- NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=jakmatch-xxxx.firebaseapp.com
+- NEXT_PUBLIC_FIREBASE_PROJECT_ID=jakmatch-xxxx
+- NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=jakmatch-xxxx.firebasestorage.app
+- NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=1234567890
+- NEXT_PUBLIC_FIREBASE_APP_ID=1:1234567890:web:abcdef123456
+
+dapetin ini semua dari mana?
 ```bash
 cd jakmatch-frontend
 npm install
@@ -88,11 +106,6 @@ npm run dev
 
 - ✅ Instalasi project (Frontend & Backend).
 - ✅ Desain skema database PostgreSQL menggunakan GORM dan migrasi tabel.
-- ✅ Implementasi Landing Page utama yang interaktif dan responsif menggunakan Next.js.
+- ✅ Implementasi Landing Page, Register Page, Log In Page utama yang interaktif dan responsif.
 - ✅ Intregrasi endpoint api register dan login.
-<<<<<<< HEAD
-- ✅ Slicing dan implementasi antarmuka Halaman Login dan Register.
-- ✅ Penyesuaian skema form autentikasi berdasarkan ERD Backend terbaru.
-=======
-- ✅ fix landing page responsive
->>>>>>> labtestingpotatochips
+- ✅ Intregrasi login Firebase
