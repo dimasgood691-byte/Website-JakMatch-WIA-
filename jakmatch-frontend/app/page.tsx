@@ -173,11 +173,11 @@ export default function Home() {
       >
         <div className="flex items-center gap-2">
           <Image
-            src="/assets/logo.png"
+            src="/assets/LogoBaru.png"
             alt="Logo Jakmatch"
             width={36}
             height={36}
-            className="object-contain drop-shadow-md"
+            className="object-cover rounded-full drop-shadow-md"
           />
           <div className="flex items-center font-semibold tracking-wide drop-shadow-md">
             <div className="text-xl text-[#297add]">Jak</div>
@@ -215,19 +215,6 @@ export default function Home() {
           </Link>
           <Link
             href="/register"
-            className="bg-black text-white px-4 sm:px-6 py-2 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg"
-          >
-            Sign up
-          </Link>
-
-          <Link
-            href="/login"
-            className="relative text-white text-sm font-medium transition drop-shadow-md after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-white hover:after:w-full after:transition-all after:duration-300"
-          >
-            Log In
-          </Link>
-          <Link
-            href="#"
             className="bg-black text-white px-4 sm:px-6 py-2 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg"
           >
             Sign up
@@ -343,7 +330,7 @@ export default function Home() {
           </motion.span>
 
           {/* Glow halus di belakang Monas untuk efek estetik & kedalangan */}
-          <div
+          <motion.div
             {...createAos("zoom", 0.05, 1)}
             className="
               pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 z-25
@@ -353,7 +340,7 @@ export default function Home() {
               blur-[40px]
               filter:brightness(1.1)
             "
-          />
+          ></motion.div>
 
           {/* Layer 30: Monumen Nasional (pusat, dominan, tak dipotong mask) */}
           <motion.div
