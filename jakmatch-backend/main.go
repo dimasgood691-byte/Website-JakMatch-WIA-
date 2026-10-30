@@ -49,6 +49,9 @@ func main() {
 	// Endpoint Autentikasi (Register & Verifikasi Login Google)
 	api.POST("/register", handlers.Register)
 	api.POST("/login", handlers.Login)
+	api.POST("/forgot-password", handlers.ForgotPassword)
+	api.POST("/reset-password", handlers.ResetPassword)
+	api.GET("/session", handlers.ValidateSession)
 
 	// 6. Jalankan Server
 	port := os.Getenv("PORT")

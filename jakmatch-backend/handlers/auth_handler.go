@@ -2,12 +2,17 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"net/http"
+	"os"
 	"strings"
+	"time"
+	"unicode/utf8"
 
 	"jakmatch-backend/config"
 	"jakmatch-backend/models"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -23,6 +28,46 @@ type LoginRequest struct {
 	Password string `json:"password,omitempty"` // Untuk testing manual via Postman
 }
 
+type authClaims struct {
+	UserID         string `json:"user_id"`
+	Email          string `json:"email"`
+	SessionVersion int    `json:"session_version"`
+	jwt.RegisteredClaims
+}
+
+func jwtSigningSecret() ([]byte, error) {
+	secret := os.Getenv("JWT_SECRET")
+	if len(secret) < 32 {
+		return nil, errors.New("JWT_SECRET must contain at least 32 characters")
+	}
+	return []byte(secret), nil
+}
+
+func generateToken(userID string, email string, sessionVersion int) (string, int64, error) {
+	secret, err := jwtSigningSecret()
+	if err != nil {
+		return "", 0, err
+	}
+
+	now := time.Now()
+	expires := now.Add(48 * time.Hour)
+	claims := authClaims{
+		UserID:         userID,
+		Email:          email,
+		SessionVersion: sessionVersion,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   userID,
+			Issuer:    "jakmatch-api",
+			IssuedAt:  jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(expires),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedToken, err := token.SignedString(secret)
+	return signedToken, expires.Unix(), err
+}
+
 // 1. Endpoint Register (Email & Password)
 func Register(c echo.Context) error {
 	var req RegisterRequest
@@ -34,9 +79,9 @@ func Register(c echo.Context) error {
 
 	req.Email = strings.TrimSpace(strings.ToLower(req.Email))
 
-	if req.Email == "" || len(req.Password) < 6 {
+	if req.Email == "" || utf8.RuneCountInString(req.Password) < 12 || len(req.Password) > 72 {
 		return c.JSON(http.StatusBadRequest, echo.Map{
-			"message": "Alamat Gmail wajib diisi dan password minimal 6 karakter",
+			"message": "Alamat Gmail wajib diisi dan password harus minimal 12 karakter (maksimal 72 byte)",
 		})
 	}
 
@@ -44,6 +89,12 @@ func Register(c echo.Context) error {
 	if err := config.DB.Where("email = ?", req.Email).First(&existingUser).Error; err == nil {
 		return c.JSON(http.StatusConflict, echo.Map{
 			"message": "Email ini sudah terdaftar. Silakan masuk menggunakan Google.",
+		})
+	}
+
+	if _, err := jwtSigningSecret(); err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Konfigurasi keamanan sesi belum tersedia",
 		})
 	}
 
@@ -55,8 +106,9 @@ func Register(c echo.Context) error {
 	}
 
 	newUser := models.User{
-		Email:        req.Email,
-		PasswordHash: string(hashedPassword),
+		Email:          req.Email,
+		PasswordHash:   string(hashedPassword),
+		SessionVersion: 1,
 	}
 
 	if err := config.DB.Create(&newUser).Error; err != nil {
@@ -65,9 +117,23 @@ func Register(c echo.Context) error {
 		})
 	}
 
+	//buat token sesi 48 jam dan agar user langsung masuk ke dashboard
+	token, expiresAt, err := generateToken(newUser.ID.String(), newUser.Email, newUser.SessionVersion)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Gagal membuat sesi login",
+		})
+	}
+
 	return c.JSON(http.StatusCreated, echo.Map{
-		"message": "Registrasi berhasil! Silakan masuk dengan Google menggunakan email yang sama.",
-		"user":    newUser,
+		"message":    "Registrasi berhasil! Silakan masuk dengan Google menggunakan email yang sama.",
+		"token":      token,
+		"expires_at": expiresAt,
+		"user": echo.Map{
+			"id":         newUser.ID,
+			"email":      newUser.Email,
+			"created_at": newUser.CreatedAt,
+		},
 	})
 }
 
@@ -82,7 +148,7 @@ func Login(c echo.Context) error {
 
 	var targetEmail string
 
-	// SKENARIO A: Login Menggunakan Firebase ID Token (Production / Integrasi Google Auth)
+	// Skenario A: Login via Tombol Google (Firebase ID Token)
 	if req.IDToken != "" {
 		if config.FirebaseAuth == nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
@@ -90,34 +156,30 @@ func Login(c echo.Context) error {
 			})
 		}
 
-		// Verifikasi keaslian token ke server Firebase
-		token, err := config.FirebaseAuth.VerifyIDToken(context.Background(), req.IDToken)
+		verifiedToken, err := config.FirebaseAuth.VerifyIDToken(context.Background(), req.IDToken)
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, echo.Map{
-				"message": "Token Google Firebase tidak valid atau sudah kedaluwarsa",
+				"message": "Token Google tidak valid atau sudah kedaluwarsa",
 			})
 		}
 
-		// Ambil email resmi dari klaim token Firebase
-		emailClaim, ok := token.Claims["email"].(string)
+		emailClaim, ok := verifiedToken.Claims["email"].(string)
 		if !ok || emailClaim == "" {
 			return c.JSON(http.StatusBadRequest, echo.Map{
-				"message": "Token Firebase tidak memiliki informasi email",
+				"message": "Token Google tidak memiliki informasi email",
 			})
 		}
 		targetEmail = strings.TrimSpace(strings.ToLower(emailClaim))
-
 	} else {
-		// SKENARIO B: Testing Backend via Postman (Tanpa Frontend)
+		// Skenario B: Login via Email & Password
 		targetEmail = strings.TrimSpace(strings.ToLower(req.Email))
-		if targetEmail == "" {
+		if targetEmail == "" || req.Password == "" {
 			return c.JSON(http.StatusBadRequest, echo.Map{
-				"message": "Kirimkan id_token (Firebase) atau email & password untuk testing",
+				"message": "Alamat Gmail dan password wajib diisi",
 			})
 		}
 	}
 
-	// Cek apakah email tersebut sudah pernah Registrasi di PostgreSQL
 	var user models.User
 	if err := config.DB.Where("email = ?", targetEmail).First(&user).Error; err != nil {
 		return c.JSON(http.StatusNotFound, echo.Map{
@@ -125,8 +187,7 @@ func Login(c echo.Context) error {
 		})
 	}
 
-	// Jika testing manual dengan password via Postman, cek kecocokan password
-	if req.IDToken == "" && req.Password != "" {
+	if req.IDToken == "" {
 		if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
 			return c.JSON(http.StatusUnauthorized, echo.Map{
 				"message": "Password yang Anda masukkan salah.",
@@ -134,8 +195,18 @@ func Login(c echo.Context) error {
 		}
 	}
 
+	// Buat token sesi 48 jam baru
+	token, expiresAt, err := generateToken(user.ID.String(), user.Email, user.SessionVersion)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Gagal membuat sesi login",
+		})
+	}
+
 	return c.JSON(http.StatusOK, echo.Map{
-		"message": "Berhasil masuk ke Dashboard JakMatch!",
+		"message":    "Berhasil masuk ke Dashboard JakMatch!",
+		"token":      token,
+		"expires_at": expiresAt,
 		"user": echo.Map{
 			"id":         user.ID,
 			"email":      user.Email,

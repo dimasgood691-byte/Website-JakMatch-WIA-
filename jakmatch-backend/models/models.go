@@ -13,8 +13,25 @@ type User struct {
 	ID               uuid.UUID         `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
 	Email            string            `gorm:"type:varchar(255);uniqueIndex;not null" json:"email"`
 	PasswordHash     string            `gorm:"type:varchar(255)" json:"-"`
+	SessionVersion   int               `gorm:"not null;default:1" json:"-"`
 	CreatedAt        time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
 	SavedComparisons []SavedComparison `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"saved_comparisons,omitempty"`
+}
+
+type PasswordResetToken struct {
+	ID        uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	UserID    uuid.UUID  `gorm:"type:uuid;not null;index"`
+	TokenHash string     `gorm:"type:char(64);uniqueIndex;not null"`
+	ExpiresAt time.Time  `gorm:"type:timestamp;not null;index"`
+	UsedAt    *time.Time `gorm:"type:timestamp"`
+	CreatedAt time.Time  `gorm:"type:timestamp;default:current_timestamp;index"`
+}
+
+type PasswordResetRequest struct {
+	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	EmailHash string    `gorm:"type:char(64);not null;index:idx_reset_email_created,priority:1"`
+	IPHash    string    `gorm:"type:char(64);not null;index:idx_reset_ip_created,priority:1"`
+	CreatedAt time.Time `gorm:"type:timestamp;default:current_timestamp;index;index:idx_reset_email_created,priority:2;index:idx_reset_ip_created,priority:2"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) error {

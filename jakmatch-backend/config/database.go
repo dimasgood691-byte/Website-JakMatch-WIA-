@@ -37,6 +37,8 @@ func ConnectDB() {
 	// Membuat tabel otomatis di PostgreSQL sesuai ERD
 	err = db.AutoMigrate(
 		&models.User{},
+		&models.PasswordResetToken{},
+		&models.PasswordResetRequest{},
 		&models.District{},
 		&models.UserProfile{},
 		&models.SavedComparison{},
