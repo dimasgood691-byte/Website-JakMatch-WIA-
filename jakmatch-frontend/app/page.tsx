@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,7 +22,8 @@ const JAKARTA_REGIONS = [
       { label: "Kenyamanan Lingkungan", score: 82 },
     ],
     districts: ["Kelapa Gading", "Penjaringan (PIK)", "Sunter", "Pademangan"],
-    points: "135,130 165,118 260,165 370,180 415,155 500,195 620,165 700,145 820,160 940,128 945,300 885,315 845,290 795,318 660,310 575,280 550,235 505,265 475,245 410,240 410,285 350,285 250,260 165,200",
+    points:
+      "135,130 165,118 260,165 370,180 415,155 500,195 620,165 700,145 820,160 940,128 945,300 885,315 845,290 795,318 660,310 575,280 550,235 505,265 475,245 410,240 410,285 350,285 250,260 165,200",
     labelPos: { x: 580, y: 225 },
   },
   {
@@ -39,8 +40,14 @@ const JAKARTA_REGIONS = [
       { label: "Fasilitas Gaya Hidup", score: 85 },
       { label: "Kenyamanan Lingkungan", score: 78 },
     ],
-    districts: ["Kebon Jeruk", "Grogol Petamburan", "Kembangan", "Tanjung Duren"],
-    points: "60,145 135,130 165,200 250,260 350,285 410,285 410,240 475,245 495,300 400,308 440,360 435,405 380,435 382,480 335,480 335,498 150,490 165,410 138,410 140,355 60,325",
+    districts: [
+      "Kebon Jeruk",
+      "Grogol Petamburan",
+      "Kembangan",
+      "Tanjung Duren",
+    ],
+    points:
+      "60,145 135,130 165,200 250,260 350,285 410,285 410,240 475,245 495,300 400,308 440,360 435,405 380,435 382,480 335,480 335,498 150,490 165,410 138,410 140,355 60,325",
     labelPos: { x: 265, y: 365 },
   },
   {
@@ -58,7 +65,8 @@ const JAKARTA_REGIONS = [
       { label: "Kenyamanan Lingkungan", score: 85 },
     ],
     districts: ["Menteng", "Tanah Abang", "Kemayoran", "Cempaka Putih"],
-    points: "475,245 505,265 550,235 575,280 660,310 640,355 650,405 595,430 570,462 470,435 380,435 435,405 440,360 400,308 495,300",
+    points:
+      "475,245 505,265 550,235 575,280 660,310 640,355 650,405 595,430 570,462 470,435 380,435 435,405 440,360 400,308 495,300",
     labelPos: { x: 525, y: 365 },
   },
   {
@@ -76,7 +84,8 @@ const JAKARTA_REGIONS = [
       { label: "Kenyamanan Lingkungan", score: 90 },
     ],
     districts: ["Kebayoran Baru", "Tebet", "Cilandak", "Setiabudi"],
-    points: "225,492 335,498 335,480 382,480 380,435 470,435 570,462 605,490 590,560 608,600 555,650 585,705 528,735 525,775 385,815 425,695 330,695 305,625 265,595 255,520",
+    points:
+      "225,492 335,498 335,480 382,480 380,435 470,435 570,462 605,490 590,560 608,600 555,650 585,705 528,735 525,775 385,815 425,695 330,695 305,625 265,595 255,520",
     labelPos: { x: 435, y: 590 },
   },
   {
@@ -94,7 +103,8 @@ const JAKARTA_REGIONS = [
       { label: "Kenyamanan Lingkungan", score: 88 },
     ],
     districts: ["Kramat Jati", "Duren Sawit", "Rawamangun", "Cipayung"],
-    points: "660,310 795,318 845,290 885,315 945,300 945,400 915,485 860,495 820,550 735,555 765,620 790,725 768,805 680,838 585,765 525,775 528,735 585,705 555,650 608,600 590,560 605,490 570,462 595,430 650,405 640,355",
+    points:
+      "660,310 795,318 845,290 885,315 945,300 945,400 915,485 860,495 820,550 735,555 765,620 790,725 768,805 680,838 585,765 525,775 528,735 585,705 555,650 608,600 590,560 605,490 570,462 595,430 650,405 640,355",
     labelPos: { x: 740, y: 480 },
   },
 ];
@@ -126,6 +136,7 @@ export default function Home() {
   const [isScrolling, setIsScrolling] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState(JAKARTA_REGIONS[3]);
   const [hoveredRegionId, setHoveredRegionId] = useState<string | null>(null);
+  const mainRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let scrollTimeout: NodeJS.Timeout;
@@ -138,46 +149,91 @@ export default function Home() {
       }, 300);
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    const el = mainRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      el.removeEventListener("scroll", handleScroll);
       clearTimeout(scrollTimeout);
     };
   }, []);
 
   return (
-    <main className="relative w-full flex flex-col font-sans overflow-x-hidden">
-
+    <main
+      ref={mainRef}
+      className="relative w-full flex flex-col font-sans overflow-x-hidden h-screen overflow-y-scroll snap-y snap-mandatory snap-container"
+    >
       {/* ========================================= */}
       {/* SMART NAVBAR (Tanpa Efek Blur / Background) */}
       {/* ========================================= */}
       <nav
-        className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6 bg-transparent transition-transform duration-300 ease-in-out ${isScrolling ? "-translate-y-full" : "translate-y-0"
-          }`}
+        className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6 bg-transparent transition-transform duration-300 ease-in-out ${
+          isScrolling ? "-translate-y-full" : "translate-y-0"
+        }`}
       >
         <div className="flex items-center gap-2">
-          <Image src="/assets/logo.png" alt="Logo Jakmatch" width={36} height={36} className="object-contain drop-shadow-md" />
-          <span className="text-xl font-semibold text-white tracking-wide drop-shadow-md">Jakmatch</span>
+          <Image
+            src="/assets/LogoBaru.png"
+            alt="Logo Jakmatch"
+            width={36}
+            height={36}
+            className="object-cover rounded-full drop-shadow-md"
+          />
+          <div className="flex items-center font-semibold tracking-wide drop-shadow-md">
+            <div className="text-xl text-[#297add]">Jak</div>
+            <div className="text-xl text-white">Match</div>
+          </div>
         </div>
 
         <div className="hidden md:flex items-center bg-[#E5E5E5] rounded-full p-1.5 shadow-sm">
-          <Link href="#" className="bg-black text-white px-5 py-1.5 rounded-full text-xs font-bold tracking-wide">HOME</Link>
-          <Link href="#" className="text-gray-900 px-5 py-1.5 rounded-full text-xs font-bold hover:bg-black/5 transition tracking-wide">SERVICES</Link>
-          <Link href="#" className="text-gray-900 px-5 py-1.5 rounded-full text-xs font-bold hover:bg-black/5 transition tracking-wide">ABOUTUS</Link>
+          <Link
+            href="#"
+            className="bg-black text-white px-5 py-1.5 rounded-full text-xs font-bold tracking-wide"
+          >
+            HOME
+          </Link>
+          <Link
+            href="#"
+            className="text-gray-900 px-5 py-1.5 rounded-full text-xs font-bold hover:bg-black/5 transition tracking-wide"
+          >
+            SERVICES
+          </Link>
+          <Link
+            href="#"
+            className="text-gray-900 px-5 py-1.5 rounded-full text-xs font-bold hover:bg-black/5 transition tracking-wide"
+          >
+            ABOUTUS
+          </Link>
         </div>
 
         <div className="flex items-center gap-3 sm:gap-6">
-          <Link href="/login" className="relative text-white text-sm font-medium transition drop-shadow-md after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-white hover:after:w-full after:transition-all after:duration-300">Log In</Link>
-          <Link href="#" className="bg-black text-white px-4 sm:px-6 py-2 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg">Sign up</Link>
+          <Link
+            href="/login"
+            className="relative text-white text-sm font-medium transition drop-shadow-md after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-white hover:after:w-full after:transition-all after:duration-300"
+          >
+            Log In
+          </Link>
+          <Link
+            href="/register"
+            className="bg-black text-white px-4 sm:px-6 py-2 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg"
+          >
+            Sign up
+          </Link>
         </div>
       </nav>
 
       {/* ========================================= */}
       {/* SECTION 1: HERO & DASHBOARD               */}
       {/* ========================================= */}
-      <section className="relative isolate min-h-screen w-full flex flex-col">
+      <section className="relative isolate h-screen w-full flex flex-col shrink-0 snap-start">
         <div className="absolute inset-0 -z-10 bg-black">
-          <video autoPlay loop muted playsInline className="h-full w-full object-cover opacity-90">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="h-full w-full object-cover opacity-90"
+          >
             <source src="/assets/landing-bg.mp4" type="video/mp4" />
           </video>
           {/* Gradasi penyatu dari akhir Section 1 menuju warna langit Section 2 */}
@@ -189,19 +245,33 @@ export default function Home() {
             {...createAos("up", 0)}
             className="text-[clamp(2rem,4vw,3.75rem)] leading-[1.05] font-bold text-white mb-5 sm:mb-6 tracking-wide drop-shadow-sm"
           >
-            Live where you feel<br className="hidden sm:block" /> comfortable.
+            Live where you feel
+            <br className="hidden sm:block" /> comfortable.
           </motion.h1>
 
           <motion.p
             {...createAos("up", 0.1)}
             className="text-white max-w-2xl text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 font-medium drop-shadow-md"
           >
-            We provide this platform for those of you who are struggling to find a comfortable place to live.
+            We provide this platform for those of you who are struggling to find
+            a comfortable place to live.
           </motion.p>
-
-          <motion.div {...createAos("up", 0.2)} className="flex flex-wrap justify-center gap-3 sm:gap-4">
-            <Link href="#" className="bg-black text-white px-8 py-3 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg">Sign Up</Link>
-            <Link href="#" className="bg-white text-black px-8 py-3 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-lg">Try Free Now</Link>
+          <motion.div
+            {...createAos("up", 0.2)}
+            className="flex flex-wrap justify-center gap-3 sm:gap-4"
+          >
+            <Link
+              href="#"
+              className="bg-black text-white px-8 py-3 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg"
+            >
+              Sign Up
+            </Link>
+            <Link
+              href="#"
+              className="bg-white text-black px-8 py-3 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-lg"
+            >
+              Try Free Now
+            </Link>
           </motion.div>
         </div>
 
@@ -210,7 +280,9 @@ export default function Home() {
           className="relative z-10 flex-1 mt-12 sm:mt-14 lg:mt-12 px-4 sm:px-6 lg:px-12 flex justify-center items-end pb-12 sm:pb-16 lg:pb-24"
         >
           <div className="w-full max-w-6xl h-[clamp(17rem,45vh,28rem)] rounded-2xl sm:rounded-3xl bg-white p-5 sm:p-8 shadow-2xl flex items-center justify-center">
-            <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] text-center font-bold text-black">tampilan dashboard</h2>
+            <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] text-center font-bold text-black">
+              tampilan dashboard
+            </h2>
           </div>
         </motion.div>
       </section>
@@ -220,21 +292,22 @@ export default function Home() {
       {/* ========================================= */}
       <section
         aria-label="Jakmatch Showcase"
-        className="relative isolate h-screen w-full overflow-hidden select-none"
+        className="relative isolate h-screen w-full overflow-hidden select-none shrink-0 snap-start"
       >
-        {/* Layer 0: Background Langit + Gradasi Transisi Atas & Bawah */}
+        {/* Layer 0: Background Langit + Overlay kontras agar teks estetik & readable */}
         <div className="absolute inset-0 z-0">
-          <Image
-            src="/assets/langit.jpeg"
-            alt="Langit Cerah Jakarta"
-            fill
-            sizes="100vw"
-            className="object-cover object-center pointer-events-none"
-          />
-          {/* Gradasi Atas: Menyambung warna akhir Section 1 (#0c58b8) */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-[#0c58b8] via-[#0c58b8]/45 to-transparent" />
-          {/* Gradasi Bawah: Menyambung warna langit awal Section 3 (#257ce0) */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-52 bg-gradient-to-b from-transparent via-[#5ba4ec]/65 to-[#257ce0]" />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="h-full w-full object-cover"
+          >
+            <source src="/assets/langit.mp4" type="video/mp4" />
+          </video>
+          {/* Gradasi halus di atas & bawah untuk kedalaman & kontras teks */}
+          <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
+          <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/35 via-transparent to-black/45" />
         </div>
 
         {/* Container Komposisi Utama */}
@@ -242,45 +315,62 @@ export default function Home() {
           aria-label="JAKMATCH"
           className="relative mx-auto h-full w-full max-w-7xl px-6 md:px-16"
         >
-          {/* Layer 10 (Di Belakang Monas): Teks "JAK" */}
+          {/* Layer 20: Teks "JAK" (kiri atas, bingkai Monas) */}
           <motion.span
-            {...createAos("left", 0, 0.95)}
+            {...createAos("left", 0, 0.9)}
             className="
-              absolute left-4 sm:left-10 lg:left-20 top-[34%] md:top-[36%] z-10
-              font-mono font-black text-black leading-none
-              text-[clamp(2rem,8vw,7rem)] tracking-[0.04em] sm:tracking-[0.1em]
-              drop-shadow-[0_12px_24px_rgba(0,0,0,0.2)]
+            absolute top-1/4 sm:top-[28%] left-6 sm:left-10 lg:left-20 z-20
+            font-mono font-black text-[#297add] leading-none
+            text-[clamp(1.75rem,7vw,5.5rem)] tracking-[0.05em] sm:tracking-[0.12em]
+            drop-shadow-[0_10px_20px_rgba(0,0,0,0.55)]
+            select-none
             "
           >
             JAK
           </motion.span>
 
-          {/* Layer 20 (Tengah): Monumen Nasional dengan mask halus di bagian kaki */}
+          {/* Glow halus di belakang Monas untuk efek estetik & kedalangan */}
           <motion.div
             {...createAos("zoom", 0.05, 1)}
             className="
-              pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 z-20
-              h-[82vh] w-[360px] sm:w-[480px] md:h-[96vh] md:w-[640px]
-              [mask-image:linear-gradient(to_bottom,black_80%,transparent_99%)]
+              pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 z-25
+              h-[70vh] sm:h-[80vh] w-[520px] sm:w-[640px] md:w-[820px]
+              max-w-[90vw]
+              bg-[radial-gradient(circle_at_center,_rgba(255,215,0,0.18)_0%,transparent_70%)]
+              blur-[40px]
+              filter:brightness(1.1)
+            "
+          ></motion.div>
+
+          {/* Layer 30: Monumen Nasional (pusat, dominan, tak dipotong mask) */}
+          <motion.div
+            {...createAos("zoom", 0.05, 1)}
+            className="
+              pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 z-30
+              h-[90vh] sm:h-[96vh] md:h-[100vh]
+              w-[360px] sm:w-[500px] md:w-[760px] lg:w-[900px]
+              max-w-[92vw]
+              filter: drop-shadow-[0_28px_56px_rgba(0,0,0,0.5)]
             "
           >
             <Image
               src="/assets/monas.png"
               alt="Monumen Nasional"
               fill
-              sizes="(max-width: 768px) 480px, 640px"
-              className="object-contain object-bottom drop-shadow-[0_20px_40px_rgba(0,0,0,0.28)]"
+              sizes="(max-width: 768px) 500px, (max-width: 1024px) 760px, 900px"
+              className="object-contain object-bottom"
             />
           </motion.div>
 
-          {/* Teks tetap di belakang Monas agar tidak menutupi gambar */}
+          {/* Layer 20: Teks "MATCH" (kanan bawah, bingkai Monas) */}
           <motion.span
-            {...createAos("right", 0.15, 0.95)}
+            {...createAos("right", 0.15, 0.9)}
             className="
-              absolute right-4 sm:right-10 lg:right-20 bottom-[26%] md:bottom-[28%] z-10
-              font-mono font-black text-black leading-none
-              text-[clamp(2rem,8vw,7rem)] tracking-[0.04em] sm:tracking-[0.1em]
-              drop-shadow-[0_12px_24px_rgba(0,0,0,0.22)]
+              absolute bottom-1/4 sm:bottom-[30%] right-6 sm:right-10 lg:right-20 z-20
+              font-mono font-black text-white leading-none
+              text-[clamp(1.75rem,7vw,5.5rem)] tracking-[0.05em] sm:tracking-[0.12em]
+              drop-shadow-[0_10px_20px_rgba(0,0,0,0.55)]
+              select-none
             "
           >
             MATCH
@@ -291,8 +381,7 @@ export default function Home() {
       {/* ========================================= */}
       {/* SECTION 3: INTERACTIVE MAP (COMPACT CARD) */}
       {/* ========================================= */}
-      <section className="relative isolate min-h-screen w-full flex items-center justify-center pt-24 sm:pt-28 pb-10 sm:pb-12 px-4 sm:px-6 lg:px-12 xl:px-16 overflow-hidden">
-
+      <section className="relative isolate h-screen w-full flex items-center justify-center pt-24 sm:pt-28 pb-10 sm:pb-12 px-4 sm:px-6 lg:px-12 xl:px-16 overflow-hidden shrink-0 snap-start">
         {/* Background Padang Rumput & Langit + Gradasi Penyatu dari Section 2 */}
         <div className="absolute inset-0 -z-20">
           <Image
@@ -307,7 +396,6 @@ export default function Home() {
         </div>
 
         <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 xl:gap-12 items-center z-10">
-
           {/* KIRI: PETA INTERAKTIF & FILTER CEPAT (7 Kolom) */}
           <motion.div
             {...createAos("left", 0)}
@@ -361,10 +449,11 @@ export default function Home() {
                         x={region.labelPos.x}
                         y={region.labelPos.y}
                         textAnchor="middle"
-                        className={`text-[21px] font-bold tracking-tight pointer-events-none transition-colors duration-200 ${isSelected || isHovered
+                        className={`text-[21px] font-bold tracking-tight pointer-events-none transition-colors duration-200 ${
+                          isSelected || isHovered
                             ? "fill-white"
                             : "fill-neutral-800/80"
-                          }`}
+                        }`}
                       >
                         {region.name.replace("Jakarta ", "Jak. ")}
                       </text>
@@ -382,10 +471,11 @@ export default function Home() {
                   <button
                     key={region.id}
                     onClick={() => setSelectedRegion(region)}
-                    className={`px-3.5 py-1 rounded-full text-[11px] font-bold tracking-wide transition-all ${active
+                    className={`px-3.5 py-1 rounded-full text-[11px] font-bold tracking-wide transition-all ${
+                      active
                         ? "bg-black text-white shadow-sm"
                         : "text-neutral-700 hover:bg-black/5"
-                      }`}
+                    }`}
                   >
                     {region.name.replace("Jakarta ", "")}
                   </button>
@@ -410,8 +500,12 @@ export default function Home() {
               >
                 {/* Meta Bar Atas */}
                 <div className="flex items-center justify-between text-[11px] font-mono text-neutral-400 pb-2.5 border-b border-neutral-100">
-                  <span>REGION {selectedRegion.index} / 05 — {selectedRegion.code}</span>
-                  <span className="text-neutral-600 font-medium">{selectedRegion.area}</span>
+                  <span>
+                    REGION {selectedRegion.index} / 05 — {selectedRegion.code}
+                  </span>
+                  <span className="text-neutral-600 font-medium">
+                    {selectedRegion.area}
+                  </span>
                 </div>
 
                 {/* Judul Wilayah & Deskripsi */}
@@ -429,8 +523,12 @@ export default function Home() {
                   {selectedRegion.metrics.map((metric) => (
                     <div key={metric.label}>
                       <div className="flex justify-between text-[11px] mb-1">
-                        <span className="font-medium text-neutral-600">{metric.label}</span>
-                        <span className="font-mono font-bold text-black">{metric.score}/100</span>
+                        <span className="font-medium text-neutral-600">
+                          {metric.label}
+                        </span>
+                        <span className="font-mono font-bold text-black">
+                          {metric.score}/100
+                        </span>
                       </div>
                       <div className="w-full h-1 bg-neutral-100 rounded-full overflow-hidden">
                         <motion.div
@@ -464,8 +562,12 @@ export default function Home() {
                 {/* Footer Kartu: Harga & Tombol CTA */}
                 <div className="mt-4 pt-3.5 border-t border-neutral-100 flex items-center justify-between gap-3">
                   <div>
-                    <span className="text-[10px] text-neutral-400 block">Rata-rata Sewa / Bln</span>
-                    <span className="text-sm font-bold text-black">{selectedRegion.avgRent}</span>
+                    <span className="text-[10px] text-neutral-400 block">
+                      Rata-rata Sewa / Bln
+                    </span>
+                    <span className="text-sm font-bold text-black">
+                      {selectedRegion.avgRent}
+                    </span>
                   </div>
 
                   <Link
@@ -473,18 +575,26 @@ export default function Home() {
                     className="bg-black text-white px-4 py-2.5 rounded-xl text-xs font-bold tracking-wide hover:bg-neutral-800 transition flex items-center gap-1.5 shrink-0"
                   >
                     <span>Explore Area</span>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2.5}
+                        d="M14 5l7 7m0 0l-7 7m7-7H3"
+                      />
                     </svg>
                   </Link>
                 </div>
               </motion.div>
             </AnimatePresence>
           </motion.div>
-
         </div>
       </section>
-
     </main>
   );
 }
