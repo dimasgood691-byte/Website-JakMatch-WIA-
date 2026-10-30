@@ -90,4 +90,4 @@ npm run dev
 - ✅ Desain skema database PostgreSQL menggunakan GORM dan migrasi tabel.
 - ✅ Implementasi Landing Page utama yang interaktif dan responsif menggunakan Next.js.
 - ✅ Intregrasi endpoint api register dan login.
-- ✅
+- ✅ fix landing page responsive
