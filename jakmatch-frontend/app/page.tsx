@@ -167,13 +167,12 @@ export default function Home() {
       {/* SMART NAVBAR (Tanpa Efek Blur / Background) */}
       {/* ========================================= */}
       <nav
-        className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6 bg-transparent transition-transform duration-300 ease-in-out ${
-          isScrolling ? "-translate-y-full" : "translate-y-0"
-        }`}
+        className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6 bg-transparent transition-transform duration-300 ease-in-out ${isScrolling ? "-translate-y-full" : "translate-y-0"
+          }`}
       >
         <div className="flex items-center gap-2">
           <Image
-            src="/assets/LogoBaru.png"
+            src="/assets/logo-jakmatch.png"
             alt="Logo Jakmatch"
             width={36}
             height={36}
@@ -187,19 +186,19 @@ export default function Home() {
 
         <div className="hidden md:flex items-center bg-[#E5E5E5] rounded-full p-1.5 shadow-sm">
           <Link
-            href="#"
+            href="#home"
             className="bg-black text-white px-5 py-1.5 rounded-full text-xs font-bold tracking-wide"
           >
             HOME
           </Link>
           <Link
-            href="#"
+            href="#service"
             className="text-gray-900 px-5 py-1.5 rounded-full text-xs font-bold hover:bg-black/5 transition tracking-wide"
           >
             SERVICES
           </Link>
           <Link
-            href="#"
+            href="#abouts"
             className="text-gray-900 px-5 py-1.5 rounded-full text-xs font-bold hover:bg-black/5 transition tracking-wide"
           >
             ABOUTUS
@@ -225,7 +224,9 @@ export default function Home() {
       {/* ========================================= */}
       {/* SECTION 1: HERO & DASHBOARD               */}
       {/* ========================================= */}
-      <section className="relative isolate h-screen w-full flex flex-col shrink-0 snap-start">
+      <section className="relative isolate h-screen w-full flex flex-col shrink-0 snap-start"
+      id="home"
+      >
         <div className="absolute inset-0 -z-10 bg-black">
           <video
             autoPlay
@@ -261,13 +262,13 @@ export default function Home() {
             className="flex flex-wrap justify-center gap-3 sm:gap-4"
           >
             <Link
-              href="#"
+              href="/register"
               className="bg-black text-white px-8 py-3 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg"
             >
               Sign Up
             </Link>
             <Link
-              href="#"
+              href="/register"
               className="bg-white text-black px-8 py-3 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-lg"
             >
               Try Free Now
@@ -293,6 +294,7 @@ export default function Home() {
       <section
         aria-label="Jakmatch Showcase"
         className="relative isolate h-screen w-full overflow-hidden select-none shrink-0 snap-start"
+        id="service"
       >
         {/* Layer 0: Background Langit + Overlay kontras agar teks estetik & readable */}
         <div className="absolute inset-0 z-0">
@@ -353,13 +355,13 @@ export default function Home() {
               filter: drop-shadow-[0_28px_56px_rgba(0,0,0,0.5)]
             "
           >
-            <Image
+            {/* <Image
               src="/assets/monas.png"
               alt="Monumen Nasional"
               fill
               sizes="(max-width: 768px) 500px, (max-width: 1024px) 760px, 900px"
               className="object-contain object-bottom"
-            />
+            /> */}
           </motion.div>
 
           {/* Layer 20: Teks "MATCH" (kanan bawah, bingkai Monas) */}
@@ -381,7 +383,10 @@ export default function Home() {
       {/* ========================================= */}
       {/* SECTION 3: INTERACTIVE MAP (COMPACT CARD) */}
       {/* ========================================= */}
-      <section className="relative isolate h-screen w-full flex items-center justify-center pt-24 sm:pt-28 pb-10 sm:pb-12 px-4 sm:px-6 lg:px-12 xl:px-16 overflow-hidden shrink-0 snap-start">
+      <section
+      className="relative isolate h-screen w-full flex items-center justify-center pt-24 sm:pt-28 pb-10 sm:pb-12 px-4 sm:px-6 lg:px-12 xl:px-16 overflow-hidden shrink-0 snap-start"
+      id="abouts"
+      >
         {/* Background Padang Rumput & Langit + Gradasi Penyatu dari Section 2 */}
         <div className="absolute inset-0 -z-20">
           <Image
@@ -449,11 +454,10 @@ export default function Home() {
                         x={region.labelPos.x}
                         y={region.labelPos.y}
                         textAnchor="middle"
-                        className={`text-[21px] font-bold tracking-tight pointer-events-none transition-colors duration-200 ${
-                          isSelected || isHovered
+                        className={`text-[21px] font-bold tracking-tight pointer-events-none transition-colors duration-200 ${isSelected || isHovered
                             ? "fill-white"
                             : "fill-neutral-800/80"
-                        }`}
+                          }`}
                       >
                         {region.name.replace("Jakarta ", "Jak. ")}
                       </text>
@@ -471,11 +475,10 @@ export default function Home() {
                   <button
                     key={region.id}
                     onClick={() => setSelectedRegion(region)}
-                    className={`px-3.5 py-1 rounded-full text-[11px] font-bold tracking-wide transition-all ${
-                      active
+                    className={`px-3.5 py-1 rounded-full text-[11px] font-bold tracking-wide transition-all ${active
                         ? "bg-black text-white shadow-sm"
                         : "text-neutral-700 hover:bg-black/5"
-                    }`}
+                      }`}
                   >
                     {region.name.replace("Jakarta ", "")}
                   </button>
