@@ -46,9 +46,10 @@ func main() {
 	api.GET("/districts", handlers.GetDistricts)
 	api.GET("/profiles", handlers.GetUserProfiles)
 
-	// Endpoint Autentikasi (Register & Verifikasi Login Google)
+	// Endpoint Autentikasi & Manajemen Sesi
 	api.POST("/register", handlers.Register)
 	api.POST("/login", handlers.Login)
+	api.POST("/logout", handlers.Logout)
 	api.POST("/forgot-password", handlers.ForgotPassword)
 	api.POST("/reset-password", handlers.ResetPassword)
 	api.GET("/session", handlers.ValidateSession)

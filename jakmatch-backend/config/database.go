@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
-	"jakmatch-backend/models"
 	"log"
 	"os"
+
+	"jakmatch-backend/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -29,12 +30,11 @@ func ConnectDB() {
 	}
 
 	// Mengaktifkan ekstensi UUID bawaan PostgreSQL
-	db.Exec("CREATE EXTENSION IF NOT EXISTS \"pgcrypto\";")
-	if err := db.Exec("CREATE EXTENSION IF NOT EXISTS \"pgcrypto\";").Error; err != nil {
+	if err := db.Exec(`CREATE EXTENSION IF NOT EXISTS "pgcrypto";`).Error; err != nil {
 		log.Fatalf("Gagal mengaktifkan ekstensi pgcrypto: %v", err)
 	}
 
-	// Membuat tabel otomatis di PostgreSQL sesuai ERD
+	// Migrasi otomatis seluruh skema tabel sesuai ERD
 	err = db.AutoMigrate(
 		&models.User{},
 		&models.PasswordResetToken{},
