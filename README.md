@@ -28,74 +28,69 @@ JakMatch adalah platform web data-driven yang dirancang untuk membantu warga DKI
 
 ## Tech Stack yang Digunakan
 
-- **Frontend:** Next.js, Tailwind CSS, Framer Motion, dan Lucide Icons.
-- **Backend:** Echo Framework, dan GORM (ORM).
+- **Frontend:** Next.js.
+- **Backend:** Echo Framework.
 - **Database:** PostgreSQL.
 - **Autentikasi:** Firebase Auth.
 
 ---
 
-## Langkah Instalasi
+## Langkah Instalasi Project
 
 Ikuti langkah-langkah di bawah ini untuk menjalankan proyek secara local:
 
-### 1. Buat Folder Kosong
-
-Folder name nya bebas, bisa disesuaikan.
-
-### 2. Clone Repository
+### 1. Clone Repository
 
 ```bash
-git clone [https://github.com/dimasgood691-byte/Website-JakMatch-WIA-.git]
+git clone https://github.com/dimasgood691-byte/Website-JakMatch-WIA-.git
 cd Website-JakMatch-WIA-
 ```
 
-### 3. Buat Database di PostgreSQL
+### 2. Buat Database di PostgreSQL
 
 ```sql
 CREATE DATABASE jakmatch_db;
 ```
 
-### 4. Run Backend
+### 3. Run Backend
 
 Buat File bernama .env di folder jakmatch-backend yang berisikan :
 
-- DB_HOST=localhost
-- DB_PORT=5432
-- DB_USER=postgres
-- DB_PASSWORD=disesuaikan dengan password database yang telah dibuat.
-- DB_NAME=jakmatch_db
-- DB_SSLMODE=disable
-- PORT=8080
-- JWT_SECRET=menyesuaikan
-- FIREBASE_CREDENTIALS_PATH=serviceAccountKey.json
-- APP_BASE_URL=http://localhost:3000
-- SMTP_HOST=smtp.gmail.com
-- SMTP_PORT=465
-- SMTP_USERNAME=gmail pengirim
-- MTP_PASSWORD=app-password-gmail
-- SMTP_FROM="JakMatch <alat-pengirim@gmail.com>"
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=disesuaikan dengan password database yang telah dibuat.
+DB_NAME=jakmatch_db
+DB_SSLMODE=disable
+PORT=8080
+JWT_SECRET=C1AF6FFBACD1CA49E383E3CA70F6972A005600912721FD835EAAE5CDB0D3E73D
+FIREBASE_CREDENTIALS_PATH=serviceAccountKey.json
+APP_BASE_URL=http://localhost:3000
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_USERNAME=gmail pengirim
+SMTP_PASSWORD=app-password-gmail
+SMTP_FROM=JakMatch <alat-pengirim@gmail.com>
 
 ```bash
 cd jakmatch-backend
 # Pastikan file .env sudah dikonfigurasi dengan database PostgreSQL lokalmu
 go mod tidy
-go run cmd/server/main.go
+go run main.go
 # Backend Run di port 8080
 ```
 
-### 5. Run Frontend
+### 4. Run Frontend
 
-Buat File bernama .env.local di folder jakmatch-backend yang berisikan :
-- NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
-- NEXT_PUBLIC_FIREBASE_API_KEY=isi_api_key_firebase_kamu
-- NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=jakmatch-xxxx.firebaseapp.com
-- NEXT_PUBLIC_FIREBASE_PROJECT_ID=jakmatch-xxxx
-- NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=jakmatch-xxxx.firebasestorage.app
-- NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=1234567890
-- NEXT_PUBLIC_FIREBASE_APP_ID=1:1234567890:web:abcdef123456
+Buat File bernama .env.local di folder jakmatch-frontend yang berisikan :
+NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
+NEXT_PUBLIC_FIREBASE_API_KEY=isi_api_key_firebase_kamu
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=jakmatch-xxxx.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=jakmatch-xxxx
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=jakmatch-xxxx.firebasestorage.app
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=1234567890
+NEXT_PUBLIC_FIREBASE_APP_ID=1:1234567890:web:abcdef123456
 
-dapetin ini semua dari mana?
 ```bash
 cd jakmatch-frontend
 npm install
@@ -104,8 +99,14 @@ npm run dev
 
 ## Progres saat ini
 
-- ✅ Instalasi project (Frontend & Backend).
-- ✅ Desain skema database PostgreSQL menggunakan GORM dan migrasi tabel.
-- ✅ Implementasi Landing Page, Register Page, Log In Page utama yang interaktif dan responsif.
-- ✅ Intregrasi endpoint api register dan login.
-- ✅ Intregrasi login Firebase
+✅ Instalasi dan setup arsitektur proyek (Frontend, Backend, Database).
+
+✅ Desain skema database PostgreSQL menggunakan GORM beserta auto-migration tabel.
+
+✅ Integrasi endpoint API /register (auto-login) dan /login dengan manajemen sesi JWT 48 jam.
+
+✅ Pembuatan tampilan Landing Page, Register, dan Login yang interaktif serta responsif.
+
+✅ Pembuatan halaman Dashboard dengan proteksi rute (Route Guard).
+
+✅ Integrasi autentikasi Firebase (Google OAuth) di sisi backend dan frontend.
