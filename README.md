@@ -56,21 +56,22 @@ CREATE DATABASE jakmatch_db;
 
 Buat File bernama .env di folder jakmatch-backend yang berisikan :
 
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=disesuaikan dengan password database yang telah dibuat.
-DB_NAME=jakmatch_db
-DB_SSLMODE=disable
-PORT=8080
-JWT_SECRET=C1AF6FFBACD1CA49E383E3CA70F6972A005600912721FD835EAAE5CDB0D3E73D
-FIREBASE_CREDENTIALS_PATH=serviceAccountKey.json
-APP_BASE_URL=http://localhost:3000
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=465
-SMTP_USERNAME=gmail pengirim
-SMTP_PASSWORD=app-password-gmail
-SMTP_FROM=JakMatch <alat-pengirim@gmail.com>
+- DB_HOST=localhost
+- DB_PORT=5432
+- DB_USER=postgres
+- DB_PASSWORD=sesuaikan_password_postgres_lokal
+- DB_NAME=jakmatch_db
+- DB_SSLMODE=disable
+- PORT=8080
+- JWT_SECRET=C1AF6FFBACD1CA49E383E3CA70F6972A005600912721FD835EAAE5CDB0D3E73D
+
+- FIREBASE_CREDENTIALS_PATH=serviceAccountKey.json
+- APP_BASE_URL=http://localhost:3000
+- SMTP_HOST=smtp.gmail.com
+- SMTP_PORT=465
+- SMTP_USERNAME=alamat-pengirim@gmail.com
+- SMTP_PASSWORD=app-password-gmail
+- SMTP_FROM="JakMatch <alamat-pengirim@gmail.com>"
 
 ```bash
 cd jakmatch-backend
@@ -83,13 +84,15 @@ go run main.go
 ### 4. Run Frontend
 
 Buat File bernama .env.local di folder jakmatch-frontend yang berisikan :
-NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
-NEXT_PUBLIC_FIREBASE_API_KEY=isi_api_key_firebase_kamu
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=jakmatch-xxxx.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=jakmatch-xxxx
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=jakmatch-xxxx.firebasestorage.app
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=1234567890
-NEXT_PUBLIC_FIREBASE_APP_ID=1:1234567890:web:abcdef123456
+
+- NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
+
+- NEXT_PUBLIC_FIREBASE_API_KEY=isi_api_key_firebase_kamu
+- NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=jakmatch-xxxx.firebaseapp.com
+- NEXT_PUBLIC_FIREBASE_PROJECT_ID=jakmatch-xxxx
+- NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=jakmatch-xxxx.firebasestorage.app
+- NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=1234567890
+- NEXT_PUBLIC_FIREBASE_APP_ID=1:1234567890:web:abcdef123456
 
 ```bash
 cd jakmatch-frontend
