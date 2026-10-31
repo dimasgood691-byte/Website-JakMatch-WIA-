@@ -26,12 +26,25 @@ JakMatch adalah platform web data-driven yang dirancang untuk membantu warga DKI
 
 ---
 
+## Tim Developer
+
+|    Nama   |                    Peran                     |                     GitHub                     |
+|-----------|----------------------------------------------|------------------------------------------------|
+| **Dimas** | Project Lead & Backend Developer             | [GitHub](https://github.com/dimasgood691-byte) |
+| **Andra** | Frontend Developer                           | [GitHub](https://github.com/ridwanaulandra)    |
+| **Azzam** | UI/UX Desainer & Frontend Developer          | [GitHub](https://github.com/Azzamwahyudin1)    |
+
+---
+
+
 ## Tech Stack yang Digunakan
 
-- **Frontend:** Next.js.
-- **Backend:** Echo Framework.
-- **Database:** PostgreSQL.
-- **Autentikasi:** Firebase Auth.
+| Kategori | Teknologi | Logo |
+| :--- | :--- | :--- |
+| **Frontend** | Next.js (App Router) | ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white) |
+| **Backend** | Golang (Echo Framework) | ![Go](https://img.shields.io/badge/Go_Echo-00ADD8?style=for-the-badge&logo=go&logoColor=white) |
+| **Database** | PostgreSQL | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white) |
+| **Autentikasi** | Firebase Auth | ![Firebase](https://img.shields.io/badge/Firebase_Auth-FFCA28?style=for-the-badge&logo=firebase&logoColor=black) |
 
 ---
 
