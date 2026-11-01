@@ -42,9 +42,13 @@ func main() {
 	// 5. Daftar Endpoint API
 	api := e.Group("/api/v1")
 
-	// Endpoint Master Data
+	// Endpoint Master Data & Riwayat Analisis
 	api.GET("/districts", handlers.GetDistricts)
+	api.POST("/districts/sync-bps", handlers.SyncDistrictsFromBPS)
 	api.GET("/profiles", handlers.GetUserProfiles)
+	api.POST("/comparisons", handlers.CreateSavedComparison)
+	api.GET("/comparisons", handlers.GetSavedComparisons)
+	api.DELETE("/comparisons/:id", handlers.DeleteSavedComparison)
 
 	// Endpoint Autentikasi & Manajemen Sesi
 	api.POST("/register", handlers.Register)
