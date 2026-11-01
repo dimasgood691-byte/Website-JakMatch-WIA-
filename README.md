@@ -115,14 +115,12 @@ npm run dev
 
 ## Progres saat ini
 
-✅ Instalasi dan setup arsitektur proyek (Frontend, Backend, Database).
+## Progres Saat Ini
 
-✅ Desain skema database PostgreSQL menggunakan GORM beserta auto-migration tabel.
-
-✅ Integrasi endpoint API /register (auto-login) dan /login dengan manajemen sesi JWT 48 jam.
-
-✅ Pembuatan tampilan Landing Page, Register, dan Login yang interaktif serta responsif.
-
-✅ Pembuatan halaman Dashboard dengan proteksi rute (Route Guard).
-
-✅ Integrasi autentikasi Firebase (Google OAuth) di sisi backend dan frontend.
+- ✅ **Inisialisasi & Arsitektur Proyek:** Setup *Frontend* (Next.js), *Backend* (Golang Echo), dan *Database* (PostgreSQL).
+- ✅ **Desain & Migrasi Database (ERD):** Implementasi GORM untuk tabel `users`, `districts`, `user_profiles`, dan `saved_comparisons` dengan dukungan UUID (`pgcrypto`)[cite: 3, 4, 6].
+- ✅ **Master Data & Seeder BPS:** Otomatisasi *seeding* profil pengguna serta 42 data kecamatan resmi DKI Jakarta mengacu pada indikator BPS[cite: 7].
+- ✅ **Integrasi Web API BPS DKI Jakarta:** Endpoint sinkronisasi real-time (`/api/v1/districts/sync-bps`) untuk menarik dan menormalisasi data statistik wilayah.
+- ✅ **Autentikasi & Keamanan:** Integrasi Firebase Auth (Google OAuth) di sisi *backend* & *frontend*, lengkap dengan manajemen sesi JWT 48 jam[cite: 5].
+- ✅ **Riwayat Perbandingan & AI Synthesizer:** Pembuatan *endpoint* API untuk menyimpan hasil analisis perbandingan wilayah (`saved_comparisons`) yang siap dihubungkan dengan *Generative AI*[cite: 3, 6].
+- ✅ **Antarmuka Pengguna (UI/UX):** Pembuatan *Landing Page*, halaman *Register*, *Login*, dan *Dashboard* yang responsif.
