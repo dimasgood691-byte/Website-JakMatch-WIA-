@@ -67,7 +67,7 @@ CREATE DATABASE jakmatch_db;
 
 ### 3. Run Backend
 
-Buat File bernama <span style="color: yellow;">.env</span> di folder jakmatch-backend yang berisikan :
+Buat File bernama ![Status](https://img.shields.io/badge/.env-yellow?style=flat-square) di folder jakmatch-backend yang berisikan :
 
 - DB_HOST=localhost
 - DB_PORT=5432
