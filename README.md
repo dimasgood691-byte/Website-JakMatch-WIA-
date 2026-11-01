@@ -123,4 +123,4 @@ npm run dev
 - ✅ **Integrasi Web API BPS DKI Jakarta:** Endpoint sinkronisasi real-time (`/api/v1/districts/sync-bps`) untuk menarik dan menormalisasi data statistik wilayah.
 - ✅ **Autentikasi & Keamanan:** Integrasi Firebase Auth (Google OAuth) di sisi *backend* & *frontend*, lengkap dengan manajemen sesi JWT 48 jam[cite: 5].
 - ✅ **Riwayat Perbandingan & AI Synthesizer:** Pembuatan *endpoint* API untuk menyimpan hasil analisis perbandingan wilayah (`saved_comparisons`) yang siap dihubungkan dengan *Generative AI*[cite: 3, 6].
-- ✅ **Antarmuka Pengguna (UI/UX):** Pembuatan *Landing Page*, halaman *Register*, *Login*, dan *Dashboard* yang responsif.
+- ✅ **Antarmuka Pengguna (UI/UX):** Pembuatan *Landing Page* (Masih dalam Build 🔄️), halaman *Register*, *Login*, dan *Dashboard* yang responsif.
