@@ -67,7 +67,7 @@ CREATE DATABASE jakmatch_db;
 
 ### 3. Run Backend
 
-Buat File bernama .env di folder jakmatch-backend yang berisikan :
+Buat File bernama <span style="color: yellow;">.env</span> di folder jakmatch-backend yang berisikan :
 
 - DB_HOST=localhost
 - DB_PORT=5432
@@ -96,7 +96,7 @@ go run main.go
 
 ### 4. Run Frontend
 
-Buat File bernama .env.local di folder jakmatch-frontend yang berisikan :
+Buat File bernama <span style="color: yellow;">.env.local</span> di folder jakmatch-frontend yang berisikan :
 
 - NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
 
