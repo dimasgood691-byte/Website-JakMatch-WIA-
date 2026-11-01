@@ -96,7 +96,7 @@ go run main.go
 
 ### 4. Run Frontend
 
-Buat File bernama <span style="color: yellow;">.env.local</span> di folder jakmatch-frontend yang berisikan :
+Buat File bernama ![Status](https://img.shields.io/badge/.env.local-yellow?style=flat-square) di folder jakmatch-frontend yang berisikan :
 
 - NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
 
