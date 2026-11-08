@@ -6,13 +6,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Inter } from "next/font/google";
 import { motion, AnimatePresence } from "framer-motion";
-import { getValidSession } from "@/app/lib/session";
+import { clearSession, getValidSession } from "@/app/lib/session";
 import {
   loginWithEmail,
   loginWithGooglePopup,
   requestPasswordReset,
   validateEmailRule,
   validatePasswordRule,
+  verifyServerSession,
 } from "@/app/lib/auth";
 import PasswordLengthMeter from "@/app/components/PasswordLengthMeter";
 
@@ -47,11 +48,24 @@ export default function LoginPage() {
     ? email.trim().length > 0
     : email.trim().length > 0 && isPasswordValid;
 
-  // Cek sesi aktif 48 jam: jika masih berlaku, langsung arahkan ke /dashboard
+  // Cek sesi aktif 48 jam: verifikasi ke server, jika masih berlaku langsung arahkan ke /dashboard
   useEffect(() => {
-    if (getValidSession()) {
-      router.replace("/dashboard");
-    }
+    const session = getValidSession();
+    if (!session) return;
+
+    let cancelled = false;
+    verifyServerSession(session).then((status) => {
+      if (cancelled) return;
+      if (status === "unauthorized") {
+        void clearSession();
+      } else {
+        router.replace("/dashboard");
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   // 1. Handler Login dengan Email & Password (serta Mode Forgot Password)

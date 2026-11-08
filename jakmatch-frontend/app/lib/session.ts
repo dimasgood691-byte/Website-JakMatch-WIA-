@@ -16,19 +16,27 @@ export interface UserSession {
     photoURL?: string | null;
   };
   lastActive: number;
+  expiresAt?: number;
 }
 
 /**
  * Menyimpan token JWT dan profil pengguna ke localStorage dengan timestamp aktivitas terbaru.
  */
-export const saveSession = (token: string, user: UserSession["user"]): void => {
+export const saveSession = (
+  token: string,
+  user: UserSession["user"],
+  expiresAt?: number
+): void => {
   if (typeof window === "undefined") return;
+  const now = Date.now();
   const sessionData: UserSession = {
     token,
     user,
-    lastActive: Date.now(),
+    lastActive: now,
+    expiresAt: expiresAt ? expiresAt * 1000 : now + INACTIVITY_LIMIT_MS,
   };
   localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+  localStorage.setItem("jakmatch_token", token);
 };
 
 /**
@@ -42,16 +50,23 @@ export const getValidSession = (): UserSession | null => {
 
   try {
     const session: UserSession = JSON.parse(raw);
+    const now = Date.now();
+    const isExpiredByInactivity = now - session.lastActive > INACTIVITY_LIMIT_MS;
+    const isExpiredByToken =
+      typeof session.expiresAt === "number" && now > session.expiresAt;
+
     if (
       !session.token ||
       !session.user?.id ||
-      Date.now() - session.lastActive > INACTIVITY_LIMIT_MS
+      !session.user?.email ||
+      isExpiredByInactivity ||
+      isExpiredByToken
     ) {
       void clearSession();
       return null;
     }
 
-    session.lastActive = Date.now();
+    session.lastActive = now;
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
     return session;
   } catch {
@@ -77,9 +92,12 @@ export const clearSession = async (): Promise<void> => {
       // Abaikan jika JSON korup
     }
     localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem("jakmatch_token");
+    localStorage.removeItem("session");
+    localStorage.removeItem("token");
   }
 
-  if (tokenToRevoke) {
+  if (tokenToRevoke && !tokenToRevoke.startsWith("local_jwt_")) {
     try {
       await fetch(`${API_URL}/logout`, {
         method: "POST",

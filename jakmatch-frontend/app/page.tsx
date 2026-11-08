@@ -598,6 +598,228 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* ========================================= */}
+      {/* SECTION 4: FITUR UNGGULAN JAKMATCH        */}
+      {/* ========================================= */}
+      <section
+        id="features"
+        aria-label="Fitur Unggulan JakMatch"
+        className="relative isolate min-h-screen w-full flex flex-col justify-between pt-20 sm:pt-24 pb-8 sm:pb-10 px-4 sm:px-6 lg:px-12 xl:px-16 overflow-hidden shrink-0 snap-start bg-[#070B14] text-white"
+      >
+        {/* Dekorasi Ambient Cahaya & Grid Spasial */}
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[780px] h-[320px] rounded-full bg-[#297add]/20 blur-[120px]" />
+          <div className="absolute bottom-0 right-10 w-[420px] h-[260px] rounded-full bg-[#CDFC56]/15 blur-[110px]" />
+          <div
+            className="absolute inset-0 opacity-[0.06]"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)",
+              backgroundSize: "48px 48px",
+            }}
+          />
+        </div>
+
+        <div className="w-full max-w-7xl mx-auto flex-1 flex flex-col justify-center z-10">
+          {/* Header Section Fitur Unggulan */}
+          <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
+            <motion.div
+              {...createAos("up", 0)}
+              className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/15 text-[11px] font-mono uppercase tracking-widest text-[#CDFC56] mb-3"
+            >
+              <span className="w-2 h-2 rounded-full bg-[#CDFC56] animate-pulse" />
+              <span>Core Location Intelligence • Fitur Unggulan</span>
+            </motion.div>
+
+            <motion.h2
+              {...createAos("up", 0.08)}
+              className="text-[clamp(1.65rem,3.4vw,2.75rem)] font-extrabold tracking-tight leading-tight text-white"
+            >
+              Instrumen Keputusan Spasial{" "}
+              <span className="text-[#CDFC56]">Berbasis Data & AI</span>
+            </motion.h2>
+
+            <motion.p
+              {...createAos("up", 0.14)}
+              className="text-neutral-300 text-xs sm:text-sm leading-relaxed mt-2.5"
+            >
+              Menjembatani kompleksitas data 42 kecamatan DKI Jakarta menjadi
+              rekomendasi lokasi hunian maupun ekspansi bisnis yang objektif,
+              transparan, dan terukur.
+            </motion.p>
+          </div>
+
+          {/* Grid 4 Kartu Fitur Unggulan */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+            {/* Fitur 01 */}
+            <motion.div
+              {...createAos("up", 0.1)}
+              className="group relative rounded-3xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/10 hover:border-[#CDFC56]/50 p-5 sm:p-6 transition-all duration-300 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="w-10 h-10 rounded-2xl bg-[#CDFC56] text-neutral-950 flex items-center justify-center font-mono font-black text-sm shadow-md">
+                    01
+                  </span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/10 text-neutral-300">
+                    3 Persona Profil
+                  </span>
+                </div>
+                <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-[#CDFC56] transition-colors">
+                  Personal Priority & Smart Budget Lock
+                </h3>
+                <p className="text-xs text-neutral-300 leading-relaxed mt-2">
+                  Kustomisasi bobot prioritas 0%–100% sesuai profil{" "}
+                  <strong className="text-white">
+                    Mahasiswa/Pekerja, Keluarga, atau UMKM
+                  </strong>{" "}
+                  dengan fitur pengunci plafon anggaran otomatis.
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-neutral-400">
+                <span>Kalkulasi Real-Time</span>
+                <span className="text-[#CDFC56] font-bold">Custom Bobot</span>
+              </div>
+            </motion.div>
+
+            {/* Fitur 02 */}
+            <motion.div
+              {...createAos("up", 0.18)}
+              className="group relative rounded-3xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/10 hover:border-[#CDFC56]/50 p-5 sm:p-6 transition-all duration-300 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="w-10 h-10 rounded-2xl bg-[#297add] text-white flex items-center justify-center font-mono font-black text-sm shadow-md">
+                    02
+                  </span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/10 text-neutral-300">
+                    42 Kecamatan BPS
+                  </span>
+                </div>
+                <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-[#CDFC56] transition-colors">
+                  Multi-Mode Spatial & Radar Analytics
+                </h3>
+                <p className="text-xs text-neutral-300 leading-relaxed mt-2">
+                  Bandingkan Top 3 kecamatan lewat visualisasi{" "}
+                  <strong className="text-white">
+                    Kurva Area, Radar Poligon, & Mode Vertikal
+                  </strong>{" "}
+                  lengkap dengan indikator keterjangkauan{" "}
+                  <em>Traffic Light</em>.
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-neutral-400">
+                <span>5 Indikator Vital</span>
+                <span className="text-[#297add] font-bold">Skala 0–100</span>
+              </div>
+            </motion.div>
+
+            {/* Fitur 03 */}
+            <motion.div
+              {...createAos("up", 0.26)}
+              className="group relative rounded-3xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/10 hover:border-[#CDFC56]/50 p-5 sm:p-6 transition-all duration-300 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="w-10 h-10 rounded-2xl bg-[#CDFC56] text-neutral-950 flex items-center justify-center font-mono font-black text-sm shadow-md">
+                    03
+                  </span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/10 text-neutral-300">
+                    Anti-Halusinasi
+                  </span>
+                </div>
+                <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-[#CDFC56] transition-colors">
+                  Generative AI Trade-Off Synthesizer
+                </h3>
+                <p className="text-xs text-neutral-300 leading-relaxed mt-2">
+                  Konsultan AI berbasis{" "}
+                  <strong className="text-white">
+                    Strict JSON-Locked Prompt
+                  </strong>{" "}
+                  yang menganalisis kompromi harga sewa vs kualitas fasilitas
+                  secara dinamis dan personal.
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-neutral-400">
+                <span>Streaming Insight</span>
+                <span className="text-[#CDFC56] font-bold">100% Akurat</span>
+              </div>
+            </motion.div>
+
+            {/* Fitur 04 */}
+            <motion.div
+              {...createAos("up", 0.34)}
+              className="group relative rounded-3xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/10 hover:border-[#CDFC56]/50 p-5 sm:p-6 transition-all duration-300 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="w-10 h-10 rounded-2xl bg-[#297add] text-white flex items-center justify-center font-mono font-black text-sm shadow-md">
+                    04
+                  </span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/10 text-neutral-300">
+                    Cloud & PNG Export
+                  </span>
+                </div>
+                <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-[#CDFC56] transition-colors">
+                  Ekspor Laporan Resmi & Riwayat Akun
+                </h3>
+                <p className="text-xs text-neutral-300 leading-relaxed mt-2">
+                  Unduh kanvas laporan keputusan beresolusi tinggi dalam format{" "}
+                  <strong className="text-white">PNG sekali klik</strong> serta
+                  simpan riwayat simulasi ke database akun Anda.
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-neutral-400">
+                <span>Arsip Permanen</span>
+                <span className="text-[#297add] font-bold">Siap Presentasi</span>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* CTA Bar Menuju Ruang Kerja Dashboard */}
+          <motion.div
+            {...createAos("zoom", 0.4)}
+            className="mt-7 sm:mt-9 rounded-3xl bg-gradient-to-r from-[#11192E] via-[#15223F] to-[#11192E] border border-white/15 p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-2xl"
+          >
+            <div className="text-center sm:text-left">
+              <h4 className="text-sm sm:text-base font-bold text-white">
+                Siap menemukan lokasi paling ideal sesuai budget dan prioritas
+                Anda?
+              </h4>
+              <p className="text-xs text-neutral-300 mt-0.5">
+                Mulai simulasi parameter wilayah DKI Jakarta dan dapatkan
+                rekomendasi AI sekarang.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
+              <Link
+                href="/dashboard"
+                className="px-5 py-2.5 rounded-xl bg-[#CDFC56] hover:bg-[#b8e840] text-neutral-950 text-xs font-extrabold tracking-wide transition shadow-lg"
+              >
+                Buka Dashboard Analitik
+              </Link>
+              <Link
+                href="/register"
+                className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold tracking-wide transition"
+              >
+                Buat Akun Gratis
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Footer Minimalis */}
+        <footer className="w-full max-w-7xl mx-auto pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-neutral-400 z-10">
+          <span>
+            © 2026 JakMatch — Smart Location Intelligence Platform DKI Jakarta
+          </span>
+          <span className="font-mono text-neutral-500">
+            Powered by BPS Spatial Dataset & Generative AI
+          </span>
+        </footer>
+      </section>
     </main>
   );
 }
