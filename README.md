@@ -67,7 +67,7 @@ CREATE DATABASE jakmatch_db;
 
 ### 3. Run Backend
 
-Buat File bernama <span style="color: yellow;">.env</span> di folder jakmatch-backend yang berisikan :
+Buat File bernama ![Status](https://img.shields.io/badge/.env-yellow?style=flat-square) di folder jakmatch-backend yang berisikan :
 
 - DB_HOST=localhost
 - DB_PORT=5432
@@ -96,7 +96,7 @@ go run main.go
 
 ### 4. Run Frontend
 
-Buat File bernama <span style="color: yellow;">.env.local</span> di folder jakmatch-frontend yang berisikan :
+Buat File bernama ![Status](https://img.shields.io/badge/.env.local-yellow?style=flat-square) di folder jakmatch-frontend yang berisikan :
 
 - NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
 
@@ -123,4 +123,4 @@ npm run dev
 - ✅ **Integrasi Web API BPS DKI Jakarta:** Endpoint sinkronisasi real-time (`/api/v1/districts/sync-bps`) untuk menarik dan menormalisasi data statistik wilayah.
 - ✅ **Autentikasi & Keamanan:** Integrasi Firebase Auth (Google OAuth) di sisi *backend* & *frontend*, lengkap dengan manajemen sesi JWT 48 jam[cite: 5].
 - ✅ **Riwayat Perbandingan & AI Synthesizer:** Pembuatan *endpoint* API untuk menyimpan hasil analisis perbandingan wilayah (`saved_comparisons`) yang siap dihubungkan dengan *Generative AI*[cite: 3, 6].
-- ✅ **Antarmuka Pengguna (UI/UX):** Pembuatan *Landing Page*, halaman *Register*, *Login*, dan *Dashboard* yang responsif.
+- ✅ **Antarmuka Pengguna (UI/UX):** Pembuatan *Landing Page* (Masih dalam Build 🔄️), halaman *Register*, *Login*, dan *Dashboard* yang responsif.
