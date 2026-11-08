@@ -10,18 +10,18 @@ interface ComparisonChartProps {
 
 const SERIES_COLORS = [
     {
-        stroke: "#0F172A",
+        stroke: "#064E85",
         fill: "#CDFC56",
-        dotClass: "bg-slate-900 ring-2 ring-[#CDFC56]",
-        barClass: "bg-slate-900",
+        dotClass: "bg-[#064E85] ring-2 ring-[#CDFC56]",
+        barClass: "bg-[#064E85]",
         badgeClass: "bg-[#CDFC56] text-slate-900",
     },
     {
-        stroke: "#2563EB",
-        fill: "#2563EB",
-        dotClass: "bg-[#2563EB]",
-        barClass: "bg-[#2563EB]",
-        badgeClass: "bg-blue-50 text-blue-700",
+        stroke: "#0773BC",
+        fill: "#38BDF8",
+        dotClass: "bg-[#0773BC]",
+        barClass: "bg-[#0773BC]",
+        badgeClass: "bg-sky-50 text-[#0773BC]",
     },
     {
         stroke: "#10B981",
@@ -69,12 +69,12 @@ export default function InteractiveRadarChart({
         }));
     };
 
-    const width = 680;
-    const height = 290;
-    const padLeft = 42;
+    const width = 660;
+    const height = 280;
+    const padLeft = 36;
     const padRight = 24;
-    const padTop = 20;
-    const padBottom = 68;
+    const padTop = 18;
+    const padBottom = 56;
 
     const plotWidth = width - padLeft - padRight;
     const plotHeight = height - padTop - padBottom;
@@ -92,10 +92,10 @@ export default function InteractiveRadarChart({
 
     const baselineY = getY(0);
 
-    // Perhitungan koordinat untuk mode Radar Poligon
-    const radarCx = 200;
+    // Perhitungan koordinat untuk mode Radar Poligon (dengan padding ekstra agar label aman di layar HP)
+    const radarCx = 210;
     const radarCy = 155;
-    const radarRadius = 105;
+    const radarRadius = 96;
     const getRadarPoint = (axisIndex: number, value: number) => {
         const total = Math.max(3, axes.length);
         const angle = (Math.PI * 2 * axisIndex) / total - Math.PI / 2;
@@ -110,14 +110,15 @@ export default function InteractiveRadarChart({
         hoveredIndex !== null && hoveredIndex < axes.length ? hoveredIndex : 0;
 
     return (
-        <div className="w-full flex flex-col space-y-3">
+        <div className="w-full flex flex-col space-y-3.5">
             {/* Bar Kontrol Atas: Pilihan Mode Visual & Legend Interaktif */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="inline-flex items-center p-1 rounded-xl bg-slate-100 border border-slate-200/80 self-start">
+                {/* Segmented Control 3 Kolom di Handphone, Inline di Desktop */}
+                <div className="grid grid-cols-3 sm:inline-flex items-center p-1 rounded-xl bg-slate-100 border border-slate-200/80 w-full sm:w-auto">
                     <button
                         type="button"
                         onClick={() => setChartMode("curve")}
-                        className={`px-3 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                        className={`px-2.5 sm:px-3 py-1.5 sm:py-1 rounded-lg text-[11px] font-extrabold transition cursor-pointer text-center ${
                             chartMode === "curve"
                                 ? "bg-[#CDFC56] text-slate-900 shadow-2xs"
                                 : "text-slate-600 hover:text-slate-900"
@@ -128,7 +129,7 @@ export default function InteractiveRadarChart({
                     <button
                         type="button"
                         onClick={() => setChartMode("radar")}
-                        className={`px-3 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                        className={`px-2.5 sm:px-3 py-1.5 sm:py-1 rounded-lg text-[11px] font-extrabold transition cursor-pointer text-center ${
                             chartMode === "radar"
                                 ? "bg-[#CDFC56] text-slate-900 shadow-2xs"
                                 : "text-slate-600 hover:text-slate-900"
@@ -139,7 +140,7 @@ export default function InteractiveRadarChart({
                     <button
                         type="button"
                         onClick={() => setChartMode("bars")}
-                        className={`px-3 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                        className={`px-2.5 sm:px-3 py-1.5 sm:py-1 rounded-lg text-[11px] font-extrabold transition cursor-pointer text-center ${
                             chartMode === "bars"
                                 ? "bg-[#CDFC56] text-slate-900 shadow-2xs"
                                 : "text-slate-600 hover:text-slate-900"
@@ -150,7 +151,7 @@ export default function InteractiveRadarChart({
                 </div>
 
                 {/* Legend Kecamatan */}
-                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2.5">
                     {districts.map((district, idx) => {
                         const isHidden = !!hiddenDistricts[district.id];
                         const color = SERIES_COLORS[idx % SERIES_COLORS.length];
@@ -160,19 +161,19 @@ export default function InteractiveRadarChart({
                                 key={district.id}
                                 type="button"
                                 onClick={() => toggleDistrict(district.id)}
-                                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-bold transition cursor-pointer select-none ${
+                                className={`flex items-center gap-1.5 px-2.5 py-1.5 sm:py-1 rounded-xl border text-[11px] sm:text-xs font-bold transition cursor-pointer select-none ${
                                     isHidden
-                                        ? "opacity-40 line-through bg-slate-50 border-slate-200 text-slate-400"
-                                        : "bg-white border-slate-200 text-slate-800 hover:border-slate-300 shadow-2xs"
+                                        ? "opacity-45 line-through bg-slate-50 border-slate-200 text-slate-400"
+                                        : "bg-white border-slate-200 text-slate-800 hover:border-[#0773BC]/40 shadow-2xs"
                                 }`}
                                 title="Klik untuk menyembunyikan atau menampilkan kecamatan ini"
                             >
                                 <span
-                                    className={`w-2.5 h-2.5 rounded-full ${
+                                    className={`w-2.5 h-2.5 rounded-full shrink-0 ${
                                         isHidden ? "bg-slate-300" : color.dotClass
                                     }`}
                                 />
-                                <span>
+                                <span className="truncate max-w-[130px] sm:max-w-none">
                                     {district.district_name} ({district.finalScore.toFixed(1)})
                                 </span>
                             </button>
@@ -181,184 +182,182 @@ export default function InteractiveRadarChart({
                 </div>
             </div>
 
-            {/* MODE 1: GRAFIK KURVA DINAMIS */}
+            {/* MODE 1: GRAFIK KURVA DINAMIS (Responsif Penuh Tanpa Scroll Horizontal Paksa) */}
             {chartMode === "curve" && (
-                <div className="relative w-full overflow-x-auto pb-1">
-                    <div className="min-w-[480px] sm:min-w-0">
-                        <svg
-                            viewBox={`0 0 ${width} ${height}`}
-                            className="w-full h-auto overflow-visible select-none"
-                        >
-                            <defs>
-                                {districts.map((district, idx) => {
-                                    const color =
-                                        SERIES_COLORS[idx % SERIES_COLORS.length];
-                                    return (
-                                        <linearGradient
-                                            key={`grad-${district.id}`}
-                                            id={`area-grad-${chartId}-${district.id}`}
-                                            x1="0"
-                                            y1="0"
-                                            x2="0"
-                                            y2="1"
-                                        >
-                                            <stop
-                                                offset="0%"
-                                                stopColor={color.fill}
-                                                stopOpacity={idx === 0 ? "0.45" : "0.20"}
-                                            />
-                                            <stop
-                                                offset="100%"
-                                                stopColor={color.fill}
-                                                stopOpacity="0.0"
-                                            />
-                                        </linearGradient>
-                                    );
-                                })}
-                            </defs>
-
-                            {/* Grid Horizontal */}
-                            {yTicks.map((tick) => {
-                                const y = getY(tick);
+                <div className="w-full pt-1">
+                    <svg
+                        viewBox={`0 0 ${width} ${height}`}
+                        className="w-full h-auto overflow-visible select-none"
+                    >
+                        <defs>
+                            {districts.map((district, idx) => {
+                                const color =
+                                    SERIES_COLORS[idx % SERIES_COLORS.length];
                                 return (
-                                    <g key={tick}>
-                                        <line
-                                            x1={padLeft}
-                                            y1={y}
-                                            x2={width - padRight}
-                                            y2={y}
-                                            stroke="#E2E8F0"
-                                            strokeWidth="1"
+                                    <linearGradient
+                                        key={`grad-${district.id}`}
+                                        id={`area-grad-${chartId}-${district.id}`}
+                                        x1="0"
+                                        y1="0"
+                                        x2="0"
+                                        y2="1"
+                                    >
+                                        <stop
+                                            offset="0%"
+                                            stopColor={color.fill}
+                                            stopOpacity={idx === 0 ? "0.48" : "0.22"}
                                         />
-                                        <text
-                                            x={padLeft - 10}
-                                            y={y + 4}
-                                            textAnchor="end"
-                                            className="text-[11px] fill-slate-400 font-semibold"
-                                        >
-                                            {tick}
-                                        </text>
-                                    </g>
+                                        <stop
+                                            offset="100%"
+                                            stopColor={color.fill}
+                                            stopOpacity="0.0"
+                                        />
+                                    </linearGradient>
                                 );
                             })}
+                        </defs>
 
-                            {/* Label Sumbu X Dinamis */}
-                            {axes.map((axis, idx) => {
-                                const x = getX(idx);
-                                const isHovered = activeHoverIdx === idx;
-                                return (
-                                    <g key={axis.key}>
-                                        {isHovered && (
-                                            <line
-                                                x1={x}
-                                                y1={padTop}
-                                                x2={x}
-                                                y2={baselineY}
-                                                stroke="#0F172A"
-                                                strokeWidth="1.5"
-                                                strokeDasharray="4 4"
-                                            />
-                                        )}
+                        {/* Grid Horizontal */}
+                        {yTicks.map((tick) => {
+                            const y = getY(tick);
+                            return (
+                                <g key={tick}>
+                                    <line
+                                        x1={padLeft}
+                                        y1={y}
+                                        x2={width - padRight}
+                                        y2={y}
+                                        stroke="#E2E8F0"
+                                        strokeWidth="1"
+                                    />
+                                    <text
+                                        x={padLeft - 8}
+                                        y={y + 4}
+                                        textAnchor="end"
+                                        className="text-[11px] fill-slate-400 font-semibold"
+                                    >
+                                        {tick}
+                                    </text>
+                                </g>
+                            );
+                        })}
+
+                        {/* Label Sumbu X Dinamis */}
+                        {axes.map((axis, idx) => {
+                            const x = getX(idx);
+                            const isHovered = activeHoverIdx === idx;
+                            return (
+                                <g key={axis.key}>
+                                    {isHovered && (
                                         <line
                                             x1={x}
-                                            y1={baselineY}
+                                            y1={padTop}
                                             x2={x}
-                                            y2={baselineY + 5}
-                                            stroke="#CBD5E1"
-                                            strokeWidth="1"
+                                            y2={baselineY}
+                                            stroke="#0773BC"
+                                            strokeWidth="1.5"
+                                            strokeDasharray="4 4"
                                         />
-                                        <text
-                                            x={x}
-                                            y={baselineY + 20}
-                                            textAnchor="middle"
-                                            className={`text-[11px] font-bold transition-colors ${
-                                                isHovered
-                                                    ? "fill-slate-900"
-                                                    : "fill-slate-500"
-                                            }`}
-                                        >
-                                            {axis.shortLabel}
-                                        </text>
-                                    </g>
-                                );
-                            })}
-
-                            {/* Kurva & Area */}
-                            {districts.map((district, dIdx) => {
-                                if (hiddenDistricts[district.id]) return null;
-                                const color =
-                                    SERIES_COLORS[dIdx % SERIES_COLORS.length];
-
-                                const points = axes.map((axis, aIdx) => ({
-                                    x: getX(aIdx),
-                                    y: getY(Number(district[axis.key]) || 0),
-                                    score: Number(district[axis.key]) || 0,
-                                    label: axis.label,
-                                }));
-
-                                const linePath = createSmoothLinePath(points);
-                                const areaPath = `${linePath} L ${points[points.length - 1].x} ${baselineY} L ${points[0].x} ${baselineY} Z`;
-
-                                return (
-                                    <g key={district.id}>
-                                        <path
-                                            d={areaPath}
-                                            fill={`url(#area-grad-${chartId}-${district.id})`}
-                                        />
-                                        <path
-                                            d={linePath}
-                                            fill="none"
-                                            stroke={color.stroke}
-                                            strokeWidth={dIdx === 0 ? "3" : "2.25"}
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        />
-                                        {points.map((pt, pIdx) => (
-                                            <circle
-                                                key={`${district.id}-${pIdx}`}
-                                                cx={pt.x}
-                                                cy={pt.y}
-                                                r={
-                                                    activeHoverIdx === pIdx
-                                                        ? 5.5
-                                                        : 3.5
-                                                }
-                                                fill={
-                                                    dIdx === 0
-                                                        ? "#CDFC56"
-                                                        : "#FFFFFF"
-                                                }
-                                                stroke={color.stroke}
-                                                strokeWidth="2.5"
-                                                className="transition-all duration-150"
-                                            >
-                                                <title>{`${district.district_name} • ${pt.label}: ${pt.score.toFixed(1)}`}</title>
-                                            </circle>
-                                        ))}
-                                    </g>
-                                );
-                            })}
-
-                            {/* Area Interaktif Hover & Tap */}
-                            {axes.map((axis, idx) => {
-                                const x = getX(idx);
-                                const colWidth = plotWidth / axes.length;
-                                return (
-                                    <rect
-                                        key={`hover-${axis.key}`}
-                                        x={x - colWidth / 2}
-                                        y={padTop}
-                                        width={colWidth}
-                                        height={plotHeight}
-                                        fill="transparent"
-                                        className="cursor-pointer"
-                                        onMouseEnter={() => setHoveredIndex(idx)}
-                                        onClick={() => setHoveredIndex(idx)}
+                                    )}
+                                    <line
+                                        x1={x}
+                                        y1={baselineY}
+                                        x2={x}
+                                        y2={baselineY + 5}
+                                        stroke="#CBD5E1"
+                                        strokeWidth="1"
                                     />
-                                );
-                            })}
-                        </svg>
-                    </div>
+                                    <text
+                                        x={x}
+                                        y={baselineY + 22}
+                                        textAnchor="middle"
+                                        className={`text-[11px] font-extrabold transition-colors ${
+                                            isHovered
+                                                ? "fill-[#0773BC]"
+                                                : "fill-slate-500"
+                                        }`}
+                                    >
+                                        {axis.shortLabel}
+                                    </text>
+                                </g>
+                            );
+                        })}
+
+                        {/* Kurva & Area */}
+                        {districts.map((district, dIdx) => {
+                            if (hiddenDistricts[district.id]) return null;
+                            const color =
+                                SERIES_COLORS[dIdx % SERIES_COLORS.length];
+
+                            const points = axes.map((axis, aIdx) => ({
+                                x: getX(aIdx),
+                                y: getY(Number(district[axis.key]) || 0),
+                                score: Number(district[axis.key]) || 0,
+                                label: axis.label,
+                            }));
+
+                            const linePath = createSmoothLinePath(points);
+                            const areaPath = `${linePath} L ${points[points.length - 1].x} ${baselineY} L ${points[0].x} ${baselineY} Z`;
+
+                            return (
+                                <g key={district.id}>
+                                    <path
+                                        d={areaPath}
+                                        fill={`url(#area-grad-${chartId}-${district.id})`}
+                                    />
+                                    <path
+                                        d={linePath}
+                                        fill="none"
+                                        stroke={color.stroke}
+                                        strokeWidth={dIdx === 0 ? "3" : "2.25"}
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    />
+                                    {points.map((pt, pIdx) => (
+                                        <circle
+                                            key={`${district.id}-${pIdx}`}
+                                            cx={pt.x}
+                                            cy={pt.y}
+                                            r={
+                                                activeHoverIdx === pIdx
+                                                    ? 6
+                                                    : 4
+                                            }
+                                            fill={
+                                                dIdx === 0
+                                                    ? "#CDFC56"
+                                                    : "#FFFFFF"
+                                            }
+                                            stroke={color.stroke}
+                                            strokeWidth="2.5"
+                                            className="transition-all duration-150"
+                                        >
+                                            <title>{`${district.district_name} • ${pt.label}: ${pt.score.toFixed(1)}`}</title>
+                                        </circle>
+                                    ))}
+                                </g>
+                            );
+                        })}
+
+                        {/* Area Interaktif Hover & Tap */}
+                        {axes.map((axis, idx) => {
+                            const x = getX(idx);
+                            const colWidth = plotWidth / axes.length;
+                            return (
+                                <rect
+                                    key={`hover-${axis.key}`}
+                                    x={x - colWidth / 2}
+                                    y={padTop}
+                                    width={colWidth}
+                                    height={plotHeight}
+                                    fill="transparent"
+                                    className="cursor-pointer"
+                                    onMouseEnter={() => setHoveredIndex(idx)}
+                                    onClick={() => setHoveredIndex(idx)}
+                                />
+                            );
+                        })}
+                    </svg>
                 </div>
             )}
 
@@ -366,8 +365,8 @@ export default function InteractiveRadarChart({
             {chartMode === "radar" && (
                 <div className="w-full flex justify-center py-2">
                     <svg
-                        viewBox="0 0 400 310"
-                        className="w-full max-w-[420px] h-auto select-none"
+                        viewBox="0 0 420 310"
+                        className="w-full max-w-[400px] h-auto select-none"
                     >
                         {[25, 50, 75, 100].map((level) => {
                             const ringPoints = axes
@@ -389,7 +388,7 @@ export default function InteractiveRadarChart({
 
                         {axes.map((axis, idx) => {
                             const outer = getRadarPoint(idx, 100);
-                            const labelPt = getRadarPoint(idx, 122);
+                            const labelPt = getRadarPoint(idx, 124);
                             return (
                                 <g key={axis.key}>
                                     <line
@@ -406,7 +405,7 @@ export default function InteractiveRadarChart({
                                         textAnchor="middle"
                                         dominantBaseline="middle"
                                         onClick={() => setHoveredIndex(idx)}
-                                        className="text-[10px] font-bold fill-slate-700 cursor-pointer"
+                                        className="text-[10px] font-extrabold fill-slate-700 cursor-pointer"
                                     >
                                         {axis.shortLabel}
                                     </text>
@@ -432,7 +431,7 @@ export default function InteractiveRadarChart({
                                     <polygon
                                         points={polyPoints}
                                         fill={color.fill}
-                                        fillOpacity={dIdx === 0 ? 0.32 : 0.14}
+                                        fillOpacity={dIdx === 0 ? 0.36 : 0.16}
                                         stroke={color.stroke}
                                         strokeWidth={dIdx === 0 ? "2.5" : "2"}
                                     />
@@ -445,18 +444,18 @@ export default function InteractiveRadarChart({
 
             {/* MODE 3: MATRIKS BAR VERTIKAL (Stack Layout Nyaman untuk Mobile) */}
             {chartMode === "bars" && (
-                <div className="space-y-4 pt-1">
+                <div className="space-y-3 pt-1">
                     {axes.map((axis, aIdx) => (
                         <div
                             key={`bar-${axis.key}`}
                             onClick={() => setHoveredIndex(aIdx)}
-                            className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2"
+                            className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2.5 cursor-pointer hover:border-[#0773BC]/30 transition"
                         >
                             <div className="flex items-center justify-between text-xs">
                                 <span className="font-extrabold text-slate-900">
                                     {axis.label}
                                 </span>
-                                <span className="text-[10px] font-bold uppercase text-slate-400">
+                                <span className="text-[10px] font-bold uppercase text-[#0773BC] bg-[#0773BC]/10 px-2 py-0.5 rounded">
                                     Skala 0–100
                                 </span>
                             </div>
@@ -472,7 +471,7 @@ export default function InteractiveRadarChart({
                                             className="space-y-1"
                                         >
                                             <div className="flex justify-between text-[11px]">
-                                                <span className="font-semibold text-slate-700">
+                                                <span className="font-bold text-slate-700">
                                                     #{dIdx + 1} {district.district_name}
                                                 </span>
                                                 <span className="font-extrabold text-slate-900">
@@ -481,11 +480,7 @@ export default function InteractiveRadarChart({
                                             </div>
                                             <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
                                                 <div
-                                                    className={`h-full rounded-full ${
-                                                        dIdx === 0
-                                                            ? "bg-slate-900"
-                                                            : color.barClass
-                                                    }`}
+                                                    className={`h-full rounded-full ${color.barClass}`}
                                                     style={{ width: `${score}%` }}
                                                 />
                                             </div>
@@ -498,14 +493,14 @@ export default function InteractiveRadarChart({
                 </div>
             )}
 
-            {/* Bar Ringkasan Interaktif Indikator Terpilih */}
+            {/* Bar Ringkasan Interaktif Indikator Terpilih (Selaras dengan Tema Biru & Lime) */}
             {axes[activeHoverIdx] && (
-                <div className="px-4 py-2.5 rounded-xl bg-slate-900 text-white text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xs">
-                    <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded bg-[#CDFC56] text-slate-900 text-[10px] font-extrabold uppercase">
+                <div className="px-3.5 sm:px-4 py-2.5 rounded-xl bg-linear-to-r from-[#064E85] to-[#0773BC] text-white text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xs">
+                    <div className="flex items-center gap-2 min-w-0">
+                        <span className="px-2 py-0.5 rounded bg-[#CDFC56] text-slate-900 text-[10px] font-extrabold uppercase shrink-0">
                             Indikator Aktif
                         </span>
-                        <span className="font-bold text-[#CDFC56]">
+                        <span className="font-extrabold text-[#CDFC56] truncate">
                             {axes[activeHoverIdx].label}
                         </span>
                     </div>
@@ -522,9 +517,13 @@ export default function InteractiveRadarChart({
                                     className="flex items-center gap-1.5 text-[11px]"
                                 >
                                     <span
-                                        className={`w-2.5 h-2.5 rounded-full ${color.dotClass}`}
+                                        className={`w-2 h-2 rounded-full ${
+                                            idx === 0
+                                                ? "bg-[#CDFC56]"
+                                                : color.dotClass
+                                        }`}
                                     />
-                                    <span className="text-slate-300">
+                                    <span className="text-white/85">
                                         {d.district_name}:
                                     </span>
                                     <span className="font-extrabold text-[#CDFC56]">
@@ -538,16 +537,16 @@ export default function InteractiveRadarChart({
             )}
 
             {/* Pill Pemilih Indikator Cepat untuk Layar Sentuh / Mobile */}
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-0.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-0.5">
                 <div className="flex flex-wrap gap-1.5">
                     {axes.map((axis, idx) => (
                         <button
                             key={`pill-${axis.key}`}
                             type="button"
                             onClick={() => setHoveredIndex(idx)}
-                            className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition cursor-pointer ${
+                            className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition cursor-pointer ${
                                 activeHoverIdx === idx
-                                    ? "bg-[#CDFC56] text-slate-900 border border-[#b2e23b]"
+                                    ? "bg-[#CDFC56] text-slate-900 border border-[#b6e838] shadow-2xs"
                                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                             }`}
                         >
@@ -556,7 +555,7 @@ export default function InteractiveRadarChart({
                     ))}
                 </div>
                 <p className="text-[11px] text-slate-400">
-                    Klik nama kecamatan di atas untuk menyembunyikan/menampilkan kurva.
+                    Ketuk indikator atau nama kecamatan untuk memfokuskan kurva.
                 </p>
             </div>
         </div>
