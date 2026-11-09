@@ -113,8 +113,6 @@ npm install
 npm run dev
 ```
 
-## Progres saat ini
-
 ## Progres Saat Ini
 
 - ✅ **Inisialisasi & Arsitektur Proyek:** Setup *Frontend* (Next.js), *Backend* (Golang Echo), dan *Database* (PostgreSQL).
