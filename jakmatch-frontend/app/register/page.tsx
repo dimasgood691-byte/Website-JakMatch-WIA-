@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Inter } from "next/font/google";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import { clearSession, getValidSession } from "@/app/lib/session";
 import {
   registerWithEmail,
@@ -17,8 +18,75 @@ import PasswordLengthMeter from "@/app/components/PasswordLengthMeter";
 
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
 });
+
+// 42 Kotak Visualisasi Kecamatan DKI Jakarta (7 kolom x 6 baris = 42 kecamatan)
+// Selaras dengan warna aksen Dashboard (#CDFC56 & #0773BC)
+const HEATMAP_TILES: {
+  id: number;
+  name: string;
+  score: string;
+  level: 1 | 2 | 3 | 4 | "top";
+}[] = [
+  { id: 1, name: "Jagakarsa", score: "81.4", level: 2 },
+  { id: 2, name: "Pasar Minggu", score: "84.0", level: 2 },
+  { id: 3, name: "Cilandak", score: "87.2", level: 3 },
+  { id: 4, name: "Tebet", score: "86.5", level: 2 },
+  { id: 5, name: "Setiabudi", score: "90.1", level: 4 },
+  { id: 6, name: "Kebayoran Lama", score: "83.8", level: 2 },
+  { id: 7, name: "Pesanggrahan", score: "80.2", level: 1 },
+
+  { id: 8, name: "Pancoran", score: "84.6", level: 2 },
+  { id: 9, name: "Kebayoran Baru", score: "90.8", level: 4 },
+  { id: 10, name: "Mampang Prapatan", score: "82.5", level: 2 },
+  { id: 11, name: "Gambir", score: "89.4", level: 3 },
+  { id: 12, name: "Tanah Abang", score: "85.2", level: 3 },
+  { id: 13, name: "Senen", score: "85.9", level: 2 },
+  { id: 14, name: "Kemayoran", score: "82.7", level: 2 },
+
+  { id: 15, name: "Cempaka Putih", score: "86.8", level: 3 },
+  { id: 16, name: "Sawah Besar", score: "83.1", level: 2 },
+  { id: 17, name: "Johar Baru", score: "79.5", level: 1 },
+  { id: 18, name: "Menteng", score: "92.2", level: "top" },
+  { id: 19, name: "Matraman", score: "84.1", level: 2 },
+  { id: 20, name: "Pulo Gadung", score: "84.3", level: 2 },
+  { id: 21, name: "Jatinegara", score: "83.0", level: 3 },
+
+  { id: 22, name: "Duren Sawit", score: "81.2", level: 2 },
+  { id: 23, name: "Kramat Jati", score: "82.4", level: 3 },
+  { id: 24, name: "Makasar", score: "80.9", level: 2 },
+  { id: 25, name: "Ciracas", score: "82.1", level: 2 },
+  { id: 26, name: "Pasar Rebo", score: "81.8", level: 3 },
+  { id: 27, name: "Cipayung", score: "83.4", level: 1 },
+  { id: 28, name: "Cakung", score: "78.6", level: 2 },
+
+  { id: 29, name: "Grogol Petamburan", score: "84.8", level: 2 },
+  { id: 30, name: "Kembangan", score: "86.0", level: 3 },
+  { id: 31, name: "Kebon Jeruk", score: "83.5", level: 3 },
+  { id: 32, name: "Palmerah", score: "81.7", level: 2 },
+  { id: 33, name: "Taman Sari", score: "80.4", level: 2 },
+  { id: 34, name: "Tambora", score: "77.2", level: 2 },
+  { id: 35, name: "Cengkareng", score: "77.9", level: 1 },
+
+  { id: 36, name: "Kalideres", score: "76.8", level: 1 },
+  { id: 37, name: "Kelapa Gading", score: "86.4", level: 3 },
+  { id: 38, name: "Penjaringan", score: "82.3", level: 3 },
+  { id: 39, name: "Pademangan", score: "81.1", level: 2 },
+  { id: 40, name: "Tanjung Priok", score: "79.8", level: 2 },
+  { id: 41, name: "Koja", score: "77.5", level: 1 },
+  { id: 42, name: "Cilincing", score: "75.6", level: 3 },
+];
+
+function getTileColorClass(level: 1 | 2 | 3 | 4 | "top"): string {
+  if (level === "top") {
+    return "bg-[#CDFC56] text-[#0B1526] shadow-[0_8px_24px_rgba(205,252,86,0.38)]";
+  }
+  if (level === 4) return "bg-white/45 hover:bg-white/55 text-white";
+  if (level === 3) return "bg-white/30 hover:bg-white/40 text-white";
+  if (level === 2) return "bg-white/20 hover:bg-white/30 text-white";
+  return "bg-white/12 hover:bg-white/22 text-white";
+}
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -33,17 +101,16 @@ export default function RegisterPage() {
   // State Interaktivitas UI/UX
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [focusedField, setFocusedField] = useState<
-    "email" | "password" | "confirmPassword" | null
-  >(null);
+  const [hoveredTile, setHoveredTile] = useState<number | null>(null);
 
-  // Status kelayakan tombol Sign Up (aktif hanya ketika password >= 12 karakter & konfirmasi cocok)
+  // Status kelayakan tombol Daftar (aktif hanya ketika password >= 12 karakter & konfirmasi cocok)
   const isPasswordValid = validatePasswordRule(password) === null;
   const isConfirmValid =
     confirmPassword.length > 0 && password === confirmPassword;
   const canSubmitRegister =
     email.trim().length > 0 && isPasswordValid && isConfirmValid;
 
+  // Cek sesi aktif 48 jam: verifikasi ke server, jika masih berlaku langsung arahkan ke /dashboard
   useEffect(() => {
     const session = getValidSession();
     if (!session) return;
@@ -63,6 +130,7 @@ export default function RegisterPage() {
     };
   }, [router]);
 
+  // Handler Pendaftaran dengan Email & Password
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
@@ -80,7 +148,7 @@ export default function RegisterPage() {
     }
 
     if (password !== confirmPassword) {
-      setErrorMsg("Konfirmasi password tidak cocok dengan password Anda.");
+      setErrorMsg("Konfirmasi kata sandi tidak cocok dengan kata sandi kamu.");
       return;
     }
 
@@ -97,83 +165,148 @@ export default function RegisterPage() {
     }
   };
 
+  const activeTileInfo =
+    HEATMAP_TILES.find((t) => t.id === hoveredTile) ||
+    HEATMAP_TILES.find((t) => t.level === "top")!;
+
   return (
     <main
-      className={`${inter.className} relative min-h-dvh w-full flex flex-col justify-between overflow-x-hidden overflow-y-auto select-none`}
+      className={`${inter.className} min-h-dvh w-full flex flex-col lg:flex-row bg-linear-to-b from-[#0773BC] via-[#2B95DC] to-[#81D8FF] lg:bg-none lg:bg-[#F8FAFC] text-[#0B1526] select-none overflow-x-hidden`}
     >
-      {/* 1. BACKGROUND AWAN & GARIS LINGKARAN */}
-      <div className="fixed inset-0 -z-10">
-        <Image
-          src="/assets/bg-login.jpeg"
-          alt="Register Background"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center pointer-events-none"
-        />
-      </div>
-
-      {/* 2. HEADER LOGO JAKMATCH (Kiri Atas - Responsif & Selaras dengan Login) */}
-      <header className="w-full px-5 sm:px-10 pt-5 pb-2 sm:py-6 z-20 flex items-center justify-between">
-        <Link href="/" className="inline-flex items-center gap-2.5 group">
-          <Image
-            src="/assets/logo-jakmatch.png"
-            alt="Logo Jakmatch"
-            width={34}
-            height={34}
-            className="object-cover rounded-full transition-transform duration-300 group-hover:scale-105"
-          />
-          <span className="text-lg sm:text-xl tracking-tight font-semibold text-white drop-shadow-md">
-            <span className="text-[#297add]">Jak</span>Match
-          </span>
-        </Link>
-      </header>
-
-      {/* 3. WRAPPER TENGAH UNTUK CARD REGISTER UTAMA */}
-      <div className="flex-1 flex items-center justify-center px-4 py-4 sm:py-6 z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.97 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full max-w-[420px] rounded-[28px] bg-gradient-to-b from-[#B5F2FF] via-[#E8FAFF] to-[#FFFFFF] px-6 sm:px-9 py-8 sm:py-9 shadow-[0_20px_60px_rgba(0,0,0,0.08)] border border-white/75 flex flex-col items-center text-center"
-        >
-          {/* Ikon Pintu dengan Radius Lengkung (Squircle) */}
-          <motion.div
-            whileHover={{ scale: 1.06, rotate: -3 }}
-            transition={{ type: "spring", stiffness: 350, damping: 18 }}
-            className="w-13 h-13 sm:w-14 sm:h-14 rounded-[18px] bg-white shadow-[0_4px_14px_rgba(0,0,0,0.06)] flex items-center justify-center mb-5 overflow-hidden"
+      {/* ===================================================================== */}
+      {/* PANEL KIRI: KHUSUS DESKTOP (lg:flex) - TEMA GRADASI BIRU DASHBOARD    */}
+      {/* ===================================================================== */}
+      <section className="hidden lg:flex lg:w-[52%] xl:w-[55%] lg:min-h-dvh bg-linear-to-b from-[#0773BC] via-[#1B86D0] to-[#2B95DC] text-white lg:px-12 lg:py-10 xl:px-16 xl:py-12 flex-col justify-between relative overflow-hidden shrink-0">
+        {/* Baris Logo JakMatch Kiri Atas */}
+        <div>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2.5 group focus:outline-none"
           >
             <Image
-              src="/assets/icon-door.jpeg"
-              alt="Sign Up Icon"
-              width={30}
-              height={30}
-              className="object-contain rounded-lg mix-blend-multiply"
+              src="/assets/logo-jakmatch.png"
+              alt="Logo JakMatch"
+              width={44}
+              height={44}
+              className="rounded-xl object-contain drop-shadow-md group-hover:scale-105 transition-transform"
             />
-          </motion.div>
+            <span className="text-lg font-extrabold tracking-tight text-white">
+              JakMatch
+            </span>
+          </Link>
 
-          {/* Judul & Deskripsi */}
-          <h1 className="text-[22px] sm:text-2xl font-bold text-[#111111] tracking-tight">
-            Create an Account
+          {/* Headline Utama */}
+          <h1 className="mt-8 xl:mt-10 text-[38px] xl:text-[44px] font-extrabold tracking-tight leading-[1.14] text-white max-w-[520px]">
+            Temukan kecamatan Jakarta yang pas untuk hidupmu.
           </h1>
-          <p className="text-xs sm:text-[13px] text-neutral-500 leading-relaxed mt-2 max-w-[300px]">
-            We provide this platform for those of
-            <br className="hidden xs:inline" /> you who are struggling to find a
-            comfortable place to live.
-          </p>
+        </div>
+
+        {/* Matriks Visual 42 Kecamatan (7 Kolom x 6 Baris) */}
+        <div className="my-8 max-w-[430px] xl:max-w-[450px] w-full">
+          <div className="grid grid-cols-7 gap-2.5">
+            {HEATMAP_TILES.map((tile) => {
+              const isTop = tile.level === "top";
+              const isHovered = hoveredTile === tile.id;
+              return (
+                <div
+                  key={tile.id}
+                  onMouseEnter={() => setHoveredTile(tile.id)}
+                  onMouseLeave={() => setHoveredTile(null)}
+                  title={`${tile.name} • Skor ${tile.score}`}
+                  className={`aspect-square rounded-xl p-2 flex flex-col justify-end transition-all duration-200 cursor-default ${getTileColorClass(
+                    tile.level
+                  )} ${isHovered && !isTop ? "scale-105 ring-2 ring-[#CDFC56]/90" : ""}`}
+                >
+                  {(isTop || isHovered) && (
+                    <span
+                      className={`text-xs font-extrabold leading-none tracking-tight ${
+                        isTop ? "text-[#0B1526]" : "text-white"
+                      }`}
+                    >
+                      {tile.score}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Legend Skor Kecocokan */}
+          <div className="mt-6 flex flex-wrap items-center gap-2.5 text-xs text-white/90">
+            <span className="font-medium text-white/85">Skor kecocokan</span>
+            <div className="inline-flex items-center gap-1">
+              <span className="w-4 h-2 rounded-xs bg-white/15" />
+              <span className="w-4 h-2 rounded-xs bg-white/30" />
+              <span className="w-4 h-2 rounded-xs bg-white/50" />
+              <span className="w-4 h-2 rounded-xs bg-[#CDFC56]" />
+            </div>
+            <span className="text-white font-semibold">
+              {hoveredTile
+                ? `${activeTileInfo.name} (${activeTileInfo.score})`
+                : "42 kecamatan, satu rekomendasi teratas"}
+            </span>
+          </div>
+        </div>
+
+        {/* Footer Indikator Bawah */}
+        <div className="pt-2 text-xs text-white/80 font-medium tracking-wide">
+          © 2026 <strong className="text-white">JakMatch</strong> — Smart Location Intelligence Platform DKI Jakarta. All rights reserved.
+        </div>
+      </section>
+
+      {/* ===================================================================== */}
+      {/* PANEL KANAN (DAN TAMPILAN UTAMA NON-DESKTOP): LOGO + CARD FORM DAFTAR */}
+      {/* ===================================================================== */}
+      <section className="flex-1 min-h-dvh flex flex-col items-center justify-center px-4 py-8 sm:px-6 sm:py-10 lg:px-10 xl:px-16 lg:bg-[#F8FAFC]">
+        {/* Logo JakMatch Khusus Device Selain Desktop (Mobile & Tablet) */}
+        <div className="lg:hidden mb-6 flex items-center justify-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2.5 group focus:outline-none"
+          >
+            <Image
+              src="/assets/logo-jakmatch.png"
+              alt="Logo JakMatch"
+              width={52}
+              height={52}
+              className="rounded-xl object-cover shadow-md group-hover:scale-105 transition-transform"
+            />
+            <span className="text-xl font-extrabold tracking-tight text-white drop-shadow-xs">
+              JakMatch
+            </span>
+          </Link>
+        </div>
+
+        {/* Card Form Register */}
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+          className="w-full max-w-[420px] sm:max-w-[440px] rounded-2xl sm:rounded-3xl bg-white/95 backdrop-blur-md border border-white/80 lg:border-slate-200/90 shadow-[0_14px_40px_rgba(7,115,188,0.18)] lg:shadow-[0_12px_40px_-12px_rgba(7,115,188,0.12)] p-6 sm:p-8"
+        >
+          {/* Judul & Subjudul */}
+          <div className="space-y-1.5">
+            <h2 className="text-2xl sm:text-[28px] font-extrabold text-[#0B1526] tracking-tight">
+              Daftar Akun Baru
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+              Buat akun untuk memulai riset wilayah DKI Jakarta dan menyimpan
+              rekomendasi kecamatan pilihanmu.
+            </p>
+          </div>
 
           {/* Notifikasi Error Interaktif */}
           <AnimatePresence>
             {errorMsg && (
               <motion.div
                 initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                animate={{ opacity: 1, height: "auto", marginTop: 14 }}
+                animate={{ opacity: 1, height: "auto", marginTop: 16 }}
                 exit={{ opacity: 0, height: 0, marginTop: 0 }}
                 className="w-full overflow-hidden"
               >
                 <div
                   role="alert"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-left text-xs font-medium flex items-start gap-2 border bg-rose-50/95 text-rose-700 border-rose-200"
+                  className="w-full px-4 py-3 rounded-xl text-left text-xs font-semibold flex items-start gap-2.5 border bg-rose-50 text-rose-700 border-rose-200"
                 >
                   <span className="leading-snug">{errorMsg}</span>
                 </div>
@@ -181,242 +314,167 @@ export default function RegisterPage() {
             )}
           </AnimatePresence>
 
-          {/* FORM INPUT REGISTER */}
-          <form onSubmit={handleRegister} className="w-full mt-6 space-y-3">
-            {/* Input Email */}
-            <div className="relative flex items-center w-full">
-              <div
-                className={`absolute left-3.5 pointer-events-none flex items-center transition-opacity duration-200 ${
-                  focusedField === "email" ? "opacity-100" : "opacity-60"
-                }`}
+          {/* FORM REGISTER */}
+          <form onSubmit={handleRegister} className="mt-6 space-y-4 sm:space-y-5">
+            {/* Field Email */}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="register-email"
+                className="block text-xs font-bold uppercase tracking-wider text-slate-600"
               >
-                <Image
-                  src="/assets/icon-email.png"
-                  alt="Email Icon"
-                  width={16}
-                  height={16}
-                  className="object-contain"
-                />
-              </div>
+                Alamat Email
+              </label>
               <input
+                id="register-email"
                 type="email"
                 required
                 autoComplete="email"
                 value={email}
-                onFocus={() => setFocusedField("email")}
-                onBlur={() => setFocusedField(null)}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-                className="w-full pl-10 pr-4 py-2.5 sm:py-3 rounded-lg bg-[#EAEAEA]/90 hover:bg-[#E2E2E2]/90 focus:bg-white text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#2B2B33]/20 transition-all"
+                placeholder="nama@email.com"
+                className="w-full px-4 py-3 rounded-xl bg-slate-50/80 focus:bg-white border border-slate-200 text-sm font-medium text-[#0B1526] placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0773BC]/25 focus:border-[#0773BC] transition-all"
               />
             </div>
 
-            {/* Input Password + Toggle Show/Hide */}
-            <div className="relative flex items-center w-full">
-              <div
-                className={`absolute left-3.5 pointer-events-none flex items-center transition-opacity duration-200 ${
-                  focusedField === "password" ? "opacity-100" : "opacity-60"
-                }`}
+            {/* Field Kata Sandi + Show/Hide Password */}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="register-password"
+                className="block text-xs font-bold uppercase tracking-wider text-slate-600"
               >
-                <Image
-                  src="/assets/icon-lock.png"
-                  alt="Password Icon"
-                  width={16}
-                  height={16}
-                  className="object-contain"
+                Kata Sandi
+              </label>
+              <div className="relative flex items-center w-full">
+                <input
+                  id="register-password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  minLength={12}
+                  maxLength={72}
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Minimal 12 karakter"
+                  className={`w-full pl-4 pr-11 py-3 rounded-xl bg-slate-50/80 focus:bg-white border text-sm font-medium text-[#0B1526] placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all ${
+                    password.length > 0 && isPasswordValid
+                      ? "border-emerald-400 focus:ring-emerald-500/20 focus:border-emerald-500"
+                      : "border-slate-200 focus:ring-[#0773BC]/25 focus:border-[#0773BC]"
+                  }`}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={
+                    showPassword
+                      ? "Sembunyikan kata sandi"
+                      : "Tampilkan kata sandi"
+                  }
+                  className="absolute right-3 p-1.5 rounded-lg text-slate-400 hover:text-[#0B1526] hover:bg-slate-100 transition cursor-pointer"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Field Konfirmasi Kata Sandi + Show/Hide Confirm Password + Pendeteksi Jumlah Password */}
+            <div className="space-y-2">
+              <label
+                htmlFor="register-confirm-password"
+                className="block text-xs font-bold uppercase tracking-wider text-slate-600"
+              >
+                Konfirmasi Kata Sandi
+              </label>
+              <div className="relative flex items-center w-full">
+                <input
+                  id="register-confirm-password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  required
+                  minLength={12}
+                  maxLength={72}
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Ulangi kata sandi kamu"
+                  className={`w-full pl-4 pr-11 py-3 rounded-xl bg-slate-50/80 focus:bg-white border text-sm font-medium text-[#0B1526] placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all ${
+                    confirmPassword.length > 0 && password !== confirmPassword
+                      ? "border-rose-400 focus:ring-rose-500/20 focus:border-rose-500"
+                      : confirmPassword.length > 0 &&
+                          password === confirmPassword
+                        ? "border-emerald-400 focus:ring-emerald-500/20 focus:border-emerald-500"
+                        : "border-slate-200 focus:ring-[#0773BC]/25 focus:border-[#0773BC]"
+                  }`}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  aria-label={
+                    showConfirmPassword
+                      ? "Sembunyikan konfirmasi kata sandi"
+                      : "Tampilkan konfirmasi kata sandi"
+                  }
+                  className="absolute right-3 p-1.5 rounded-lg text-slate-400 hover:text-[#0B1526] hover:bg-slate-100 transition cursor-pointer"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+
+              {/* Fitur Pendeteksi Jumlah Karakter Password (12 Karakter) & Status Kecocokan */}
+              <div className="pt-0.5">
+                <PasswordLengthMeter
+                  password={password}
+                  minLength={12}
+                  confirmPassword={confirmPassword}
+                  showConfirmStatus
                 />
               </div>
-              <input
-                type={showPassword ? "text" : "password"}
-                required
-                minLength={12}
-                maxLength={72}
-                autoComplete="new-password"
-                value={password}
-                onFocus={() => setFocusedField("password")}
-                onBlur={() => setFocusedField(null)}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password (min. 12 karakter)"
-                className={`w-full pl-10 pr-10 py-2.5 sm:py-3 rounded-lg bg-[#EAEAEA]/90 hover:bg-[#E2E2E2]/90 focus:bg-white text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 transition-all ${
-                  password.length > 0 && isPasswordValid
-                    ? "focus:ring-emerald-500/30 ring-1 ring-emerald-500/40"
-                    : "focus:ring-[#2B2B33]/20"
-                }`}
-              />
-
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                className="absolute right-3 p-1 text-neutral-500 hover:text-neutral-800 transition cursor-pointer"
-              >
-                {showPassword ? (
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    />
-                  </svg>
-                )}
-              </button>
             </div>
 
-            {/* Input Confirm Password + Toggle Show/Hide */}
-            <div className="relative flex items-center w-full">
-              <div
-                className={`absolute left-3.5 pointer-events-none flex items-center transition-opacity duration-200 ${
-                  focusedField === "confirmPassword"
-                    ? "opacity-100"
-                    : "opacity-60"
-                }`}
-              >
-                <Image
-                  src="/assets/icon-lock.png"
-                  alt="Confirm Password Icon"
-                  width={16}
-                  height={16}
-                  className="object-contain"
-                />
-              </div>
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                required
-                minLength={12}
-                maxLength={72}
-                autoComplete="new-password"
-                value={confirmPassword}
-                onFocus={() => setFocusedField("confirmPassword")}
-                onBlur={() => setFocusedField(null)}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm Password"
-                className={`w-full pl-10 pr-10 py-2.5 sm:py-3 rounded-lg bg-[#EAEAEA]/90 hover:bg-[#E2E2E2]/90 focus:bg-white text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:ring-2 transition-all ${
-                  confirmPassword.length > 0 && password !== confirmPassword
-                    ? "focus:ring-rose-400/40 ring-1 ring-rose-400/50"
-                    : confirmPassword.length > 0 && password === confirmPassword
-                      ? "focus:ring-emerald-500/30 ring-1 ring-emerald-500/40"
-                      : "focus:ring-[#2B2B33]/20"
-                }`}
-              />
-
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword((prev) => !prev)}
-                aria-label={
-                  showConfirmPassword
-                    ? "Hide confirm password"
-                    : "Show confirm password"
-                }
-                className="absolute right-3 p-1 text-neutral-500 hover:text-neutral-800 transition cursor-pointer"
-              >
-                {showConfirmPassword ? (
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    />
-                  </svg>
-                )}
-              </button>
-            </div>
-
-            {/* Fitur Pendeteksi (Slider) Jumlah Karakter Password & Kecocokan Konfirmasi */}
-            <PasswordLengthMeter
-              password={password}
-              minLength={12}
-              confirmPassword={confirmPassword}
-              showConfirmStatus
-            />
-
-            {/* Button Sign Up (#2B2B33) - Hanya aktif setelah password >= 12 karakter & konfirmasi cocok */}
+            {/* Tombol Utama Daftar (Navy #0B1526 dengan Kotak Panah Hijau Lime Dashboard #CDFC56) */}
             <button
               type="submit"
               disabled={!canSubmitRegister || loading}
-              className="w-full py-2.5 sm:py-3 mt-2 rounded-lg bg-[#2B2B33] hover:bg-[#1f1f26] disabled:bg-neutral-400/70 disabled:text-white/85 disabled:shadow-none disabled:cursor-not-allowed active:scale-[0.99] text-white text-xs sm:text-sm font-medium tracking-wide shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+              className="w-full pl-4 pr-2.5 py-2.5 rounded-xl bg-[#0B1526] hover:bg-[#13233f] disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed active:scale-[0.99] text-white text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-between shadow-xs group"
             >
-              {loading ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Memproses...</span>
-                </>
-              ) : (
-                <span>Sign Up</span>
-              )}
+              <span>{loading ? "Memproses..." : "Buat Akun Sekarang"}</span>
+
+              <span
+                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-transform group-hover:translate-x-0.5 shrink-0 ${
+                  !canSubmitRegister || loading
+                    ? "bg-slate-300/70 text-slate-500"
+                    : "bg-[#CDFC56] text-[#0B1526]"
+                }`}
+              >
+                {loading ? (
+                  <span className="w-3.5 h-3.5 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                ) : (
+                  <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                )}
+              </span>
             </button>
           </form>
 
-          {/* Tautan ke Halaman Login */}
-          <p className="mt-5 text-[11px] sm:text-xs text-neutral-500">
-            Already have an account?{" "}
+          {/* Link Menuju Halaman Masuk */}
+          <p className="mt-6 text-center sm:text-left text-xs sm:text-sm text-slate-500">
+            Sudah punya akun?{" "}
             <Link
               href="/login"
-              className="font-bold text-[#111111] hover:underline"
+              className="font-bold text-[#0773BC] hover:text-[#055a96] underline underline-offset-4 transition"
             >
-              Log In
+              Masuk di sini
             </Link>
           </p>
         </motion.div>
-      </div>
-
-      {/* 4. FOOTER & SPACER BAWAH */}
-      <footer className="w-full py-3 px-4 text-center text-[11px] text-neutral-500/80 z-10">
-        © 2026 JakMatch — Smart Location Intelligence DKI Jakarta
-      </footer>
-
-      <div className="h-4 sm:h-8 pointer-events-none" />
+      </section>
     </main>
   );
 }

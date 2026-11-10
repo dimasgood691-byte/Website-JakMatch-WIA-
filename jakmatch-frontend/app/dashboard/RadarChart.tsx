@@ -495,12 +495,12 @@ export default function InteractiveRadarChart({
 
             {/* Bar Ringkasan Interaktif Indikator Terpilih (Selaras dengan Tema Biru & Lime) */}
             {axes[activeHoverIdx] && (
-                <div className="px-3.5 sm:px-4 py-2.5 rounded-xl bg-linear-to-r from-[#064E85] to-[#0773BC] text-white text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xs">
+                <div className="px-3.5 sm:px-4 py-2.5 rounded-xl bg-linear-to-r bg-[#161616] text-white text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xs">
                     <div className="flex items-center gap-2 min-w-0">
-                        <span className="px-2 py-0.5 rounded bg-[#CDFC56] text-slate-900 text-[10px] font-extrabold uppercase shrink-0">
+                        <span className="px-2 py-0.5 rounded bg-[#FFFFFF]/90  text-[#161616]/90 text-[10px] font-extrabold uppercase shrink-0">
                             Indikator Aktif
                         </span>
-                        <span className="font-extrabold text-[#CDFC56] truncate">
+                        <span className="font-extrabold text-[#FFFFF] truncate">
                             {axes[activeHoverIdx].label}
                         </span>
                     </div>
@@ -526,7 +526,7 @@ export default function InteractiveRadarChart({
                                     <span className="text-white/85">
                                         {d.district_name}:
                                     </span>
-                                    <span className="font-extrabold text-[#CDFC56]">
+                                    <span className="font-extrabold text-[#FFFFFF]">
                                         {val.toFixed(1)}
                                     </span>
                                 </span>

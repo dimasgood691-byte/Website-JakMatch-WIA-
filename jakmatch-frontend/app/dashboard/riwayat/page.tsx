@@ -41,9 +41,6 @@ export default function RiwayatTersimpanPage() {
         <div className="space-y-5 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4">
                 <div className="space-y-1">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#CDFC56] text-slate-900 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider shadow-2xs">
-                        Tahap 04 • Database Persistence & Arsip Interaktif
-                    </span>
                     <h2 className="text-lg sm:text-2xl font-extrabold text-white drop-shadow-xs leading-tight">
                         Riwayat Analisis Lokasi Tersimpan
                     </h2>
@@ -55,9 +52,9 @@ export default function RiwayatTersimpanPage() {
 
                 <Link
                     href="/dashboard"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-extrabold bg-[#CDFC56] hover:bg-[#b8e840] text-slate-900 border border-[#b6e838] transition shrink-0 shadow-xs"
+                    className="group w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-extrabold bg-[#CDFC56] hover:bg-[#b8e840] hover:border-[#9fcf2d] hover:shadow-[0_8px_20px_rgba(7,115,188,0.2)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CDFC56] focus-visible:ring-offset-2 border border-[#b6e838] transition-all duration-200 ease-out shrink-0 shadow-xs"
                 >
-                    <ArrowLeft className="w-4 h-4" />
+                    <ArrowLeft className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-0.5" />
                     <span>Buat Riset Baru</span>
                 </Link>
             </div>

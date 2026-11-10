@@ -29,9 +29,6 @@ export default function KomparasiFinansialPage() {
             {/* Header & Navigasi Tahap */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4">
                 <div className="space-y-1">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#CDFC56] text-slate-900 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider shadow-2xs">
-                        Tahap 02 • Visualisasi Spasial & Keterjangkauan
-                    </span>
                     <h2 className="text-lg sm:text-2xl font-extrabold text-white drop-shadow-xs leading-tight">
                         Grafik Komparasi & Status Finansial Kecamatan
                     </h2>
@@ -44,17 +41,18 @@ export default function KomparasiFinansialPage() {
                 <div className="grid grid-cols-2 sm:flex items-center gap-2.5 w-full sm:w-auto shrink-0">
                     <Link
                         href="/dashboard"
-                        className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-extrabold bg-white hover:bg-slate-50 text-[#0773BC] border border-white/80 shadow-xs transition"
+                        className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-extrabold bg-[#CDFC56] hover:bg-[#b8e840] text-[#161616] border border-[#b6e838] hover:border-[#b8e840] shadow-[0_6px_20px_rgba(7,115,188,0.18)] hover:shadow-[0_10px_26px_rgba(7,115,188,0.28)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CDFC56] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0773BC] transition-all duration-200 ease-out shrink-0"
                     >
-                        <ArrowLeft className="w-4 h-4 shrink-0" />
+                        <ArrowLeft className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                         <span className="truncate">Ubah Parameter</span>
                     </Link>
+
                     <Link
                         href="/dashboard/analisis-ai"
-                        className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-extrabold bg-[#CDFC56] hover:bg-[#b8e840] text-slate-900 border border-[#b6e838] shadow-xs transition"
+                        className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-extrabold bg-white hover:bg-[#CDFC56] text-slate-900 border border-white/80 hover:border-[#b6e838] shadow-[0_6px_20px_rgba(7,115,188,0.18)] hover:shadow-[0_10px_26px_rgba(7,115,188,0.28)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CDFC56] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0773BC] transition-all duration-200 ease-out shrink-0"
                     >
                         <span className="truncate">Lanjut Analisis AI</span>
-                        <ArrowRight className="w-4 h-4 shrink-0" />
+                        <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                     </Link>
                 </div>
             </div>
@@ -148,45 +146,53 @@ export default function KomparasiFinansialPage() {
                             <h3 className="text-sm font-extrabold text-slate-900">
                                 Kartu Keterjangkauan Finansial & Indikator Traffic Light
                             </h3>
-                            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5 text-[11px] font-bold text-slate-600">
-                                <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                                    Ideal (≥85)
-                                </span>
-                                <span className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">
-                                    <span className="w-2 h-2 rounded-full bg-amber-500" />
-                                    Sedang (76–84)
-                                </span>
-                                <span className="inline-flex items-center gap-1.5 bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-full">
-                                    <span className="w-2 h-2 rounded-full bg-rose-500" />
-                                    Kurang (&lt;76)
-                                </span>
-                            </div>
+                                <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5 text-[11px] font-bold text-slate-600">
+                                    <span className="inline-flex items-center bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                                        Ideal (≥85)
+                                    </span>
+                                    <span className="inline-flex items-center bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-0.5 rounded-full">
+                                        Sedang (76–84)
+                                    </span>
+                                    <span className="inline-flex items-center bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-0.5 rounded-full">
+                                        Kurang (&lt;76)
+                                    </span>
+                                </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
                             {topThreeDistricts.map((district, index) => (
                                 <div
                                     key={district.id}
-                                    className={`bg-white/95 backdrop-blur-md rounded-2xl border p-4 sm:p-5 shadow-[0_10px_28px_rgba(7,115,188,0.12)] flex flex-col justify-between space-y-4 transition ${
+                                    className={`bg-white/95 backdrop-blur-md rounded-2xl border p-4 sm:p-5 shadow-[0_10px_28px_rgba(7,115,188,0.12)] flex flex-col justify-between space-y-4 transition-all duration-200 ease-out hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${
                                         index === 0
-                                            ? "border-[#0773BC] ring-2 ring-[#CDFC56]"
-                                            : "border-white/80"
+                                            ? "border-slate-200/70 shadow-[0_10px_30px_rgba(7,115,188,0.18)] hover:shadow-[0_10px_30px_rgba(7,115,188,0.28)]"
+                                            : "border-slate-200/70"
                                     }`}
                                 >
                                     <div className="space-y-3">
                                         <div className="flex items-start justify-between gap-2">
                                             <div className="min-w-0">
-                                                <span
-                                                    className={`inline-block px-2.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider ${
-                                                        index === 0
-                                                            ? "bg-[#CDFC56] text-slate-900 border border-[#b6e838]"
-                                                            : "bg-[#0773BC]/10 text-[#0773BC]"
-                                                    }`}
-                                                >
-                                                    Peringkat #{index + 1} • Tier{" "}
-                                                    {district.tier_zone}
-                                                </span>
+                                                <div className="flex items-center gap-1.5">
+                                                    <span
+                                                        className={`inline-flex items-center justify-center min-w-7 h-7 rounded-lg text-xs font-extrabold ${
+                                                            index === 0
+                                                                ? "bg-[#CDFC56] text-slate-900"
+                                                                : "bg-slate-100 text-slate-700"
+                                                        }`}
+                                                    >
+                                                        {index + 1}
+                                                    </span>
+                                                    {index === 0 && (
+                                                        <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[9px] font-extrabold uppercase tracking-wider">
+                                                            Terbaik
+                                                        </span>
+                                                    )}
+                                                    {district.tier_zone && (
+                                                        <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 text-[9px] font-bold uppercase tracking-wider">
+                                                            Tier {district.tier_zone}
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <h4 className="text-base font-extrabold text-slate-900 mt-1.5 truncate">
                                                     {district.district_name}
                                                 </h4>
@@ -216,13 +222,13 @@ export default function KomparasiFinansialPage() {
 
                                             {district.isUnderBudget ? (
                                                 <div className="px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
-                                                    🟢 Underbudget: Hemat{" "}
+                                                    Underbudget: Hemat{" "}
                                                     {formatRupiah(Math.abs(district.budgetDiff))}{" "}
                                                     dari budget Anda
                                                 </div>
                                             ) : (
                                                 <div className="px-2.5 py-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-[11px] font-bold">
-                                                    🔴 Overbudget: Kurang{" "}
+                                                    Overbudget: Kurang{" "}
                                                     {formatRupiah(Math.abs(district.budgetDiff))}{" "}
                                                     dari budget Anda
                                                 </div>

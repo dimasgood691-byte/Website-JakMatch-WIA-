@@ -172,11 +172,12 @@ export const PROFILE_CONFIGS: Record<ProfileKey, ProfileMetadata> = {
 };
 
 export function formatRupiah(value: number): string {
-    return new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        maximumFractionDigits: 0,
-    }).format(value);
+    const num = Math.round(Number(value) || 0);
+    const sign = num < 0 ? "-" : "";
+    const formatted = Math.abs(num)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return `${sign}Rp ${formatted}`;
 }
 
 // Traffic Light Badge Helper (Fase 6.3)

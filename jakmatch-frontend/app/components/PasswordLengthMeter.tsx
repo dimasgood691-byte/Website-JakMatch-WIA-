@@ -1,7 +1,7 @@
 'use client';
 
 import React from "react";
-import { motion } from "framer-motion";
+import { Check, X } from "lucide-react";
 
 interface PasswordLengthMeterProps {
   password: string;
@@ -10,6 +10,12 @@ interface PasswordLengthMeterProps {
   showConfirmStatus?: boolean;
 }
 
+const MAX_BYTES = 72;
+
+/**
+ * Indikator panjang kata sandi (minimal 12 karakter, maksimal 72 byte)
+ * beserta status kecocokan konfirmasi kata sandi (opsional).
+ */
 export default function PasswordLengthMeter({
   password,
   minLength = 12,
@@ -17,143 +23,63 @@ export default function PasswordLengthMeter({
   showConfirmStatus = false,
 }: PasswordLengthMeterProps) {
   const charCount = Array.from(password).length;
-  const byteLength = new TextEncoder().encode(password).length;
-  const isTooLong = byteLength > 72;
+  const isTooLong = new TextEncoder().encode(password).length > MAX_BYTES;
   const isMet = charCount >= minLength && !isTooLong;
   const remaining = Math.max(0, minLength - charCount);
-  const progressPercent = Math.min(100, Math.round((charCount / minLength) * 100));
+  const progress = Math.min(100, (charCount / minLength) * 100);
 
-  // Penentuan warna slider & label status secara dinamis
-  const getStatusConfig = () => {
-    if (charCount === 0) {
-      return {
-        barColor: "bg-neutral-300",
-        thumbBorder: "border-neutral-400",
-        badgeClass: "bg-neutral-200/80 text-neutral-600",
-        statusText: `Wajib minimal ${minLength} karakter`,
-        textColor: "text-neutral-500",
-      };
-    }
-    if (isTooLong) {
-      return {
-        barColor: "bg-rose-500",
-        thumbBorder: "border-rose-600",
-        badgeClass: "bg-rose-100 text-rose-700",
-        statusText: "Melebihi batas maksimal 72 byte",
-        textColor: "text-rose-600",
-      };
-    }
-    if (charCount < Math.ceil(minLength / 2)) {
-      return {
-        barColor: "bg-gradient-to-r from-rose-500 to-orange-500",
-        thumbBorder: "border-rose-500",
-        badgeClass: "bg-rose-100/90 text-rose-700",
-        statusText: `Kurang ${remaining} karakter lagi`,
-        textColor: "text-rose-600",
-      };
-    }
-    if (!isMet) {
-      return {
-        barColor: "bg-gradient-to-r from-orange-400 to-amber-500",
-        thumbBorder: "border-amber-500",
-        badgeClass: "bg-amber-100/90 text-amber-800",
-        statusText: `Hampir siap! Kurang ${remaining} karakter`,
-        textColor: "text-amber-700",
-      };
-    }
-    return {
-      barColor: "bg-gradient-to-r from-emerald-500 to-teal-500",
-      thumbBorder: "border-emerald-600",
-      badgeClass: "bg-emerald-100 text-emerald-800",
-      statusText: "Password memenuhi syarat",
-      textColor: "text-emerald-700",
-    };
-  };
+  let barColor = "bg-[#0773BC]";
+  let textColor = "text-slate-500";
+  let status = `Minimal ${minLength} karakter`;
 
-  const config = getStatusConfig();
-  const isConfirmTyped = showConfirmStatus && (confirmPassword?.length ?? 0) > 0;
-  const isConfirmMatch = isConfirmTyped && password === confirmPassword;
+  if (isTooLong) {
+    barColor = "bg-rose-500";
+    textColor = "text-rose-600";
+    status = `Melebihi batas ${MAX_BYTES} byte`;
+  } else if (isMet) {
+    barColor = "bg-emerald-500";
+    textColor = "text-emerald-700";
+    status = "Panjang kata sandi sudah cukup";
+  } else if (charCount > 0) {
+    status = `Kurang ${remaining} karakter lagi`;
+  }
+
+  const showConfirm = showConfirmStatus && (confirmPassword?.length ?? 0) > 0;
+  const isMatch = showConfirm && password === confirmPassword;
 
   return (
-    <div className="w-full pt-1 pb-0.5 px-0.5 select-none">
-      {/* Baris Atas: Teks Status & Penghitung Karakter (Counter Badge) */}
-      <div className="flex items-center justify-between text-[11px] mb-1.5">
-        <span className={`font-medium transition-colors duration-200 flex items-center gap-1 ${config.textColor}`}>
-          {isMet && (
-            <motion.span
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 450, damping: 18 }}
-              className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-500 text-white text-[9px] font-bold"
-            >
-              ✓
-            </motion.span>
-          )}
-          <span>{config.statusText}</span>
-        </span>
+    <div className="mt-2" aria-live="polite">
+      <div className="h-1 w-full overflow-hidden rounded-full bg-slate-200">
+        <div
+          className={`h-full rounded-full transition-[width,background-color] duration-300 ease-out ${barColor}`}
+          style={{ width: `${progress}%` }}
+        />
+      </div>
 
-        <span
-          className={`font-mono text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors duration-200 ${config.badgeClass}`}
-        >
+      <div className="mt-1.5 flex items-center justify-between gap-3 text-xs">
+        <span className={`flex min-w-0 items-center gap-1 truncate ${textColor}`}>
+          {isMet && <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={2.5} />}
+          {status}
+        </span>
+        <span className="shrink-0 tabular-nums text-slate-400">
           {charCount}/{minLength}
         </span>
       </div>
 
-      {/* Track Slider Interaktif dengan Indikator Thumb & 12 Titik Segmen */}
-      <div className="relative w-full h-2 bg-neutral-200/90 rounded-full overflow-visible flex items-center">
-        {/* Garis Pembagi Segmen Halus (12 Karakter) */}
-        <div className="absolute inset-0 grid grid-cols-12 pointer-events-none z-10">
-          {Array.from({ length: 12 }).map((_, idx) => (
-            <div
-              key={idx}
-              className="border-r border-white/50 last:border-r-0 h-full"
-            />
-          ))}
-        </div>
-
-        {/* Bar Progres Animasi */}
-        <div className="w-full h-full rounded-full overflow-hidden">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${progressPercent}%` }}
-            transition={{ type: "spring", stiffness: 260, damping: 24 }}
-            className={`h-full rounded-full ${config.barColor}`}
-          />
-        </div>
-
-        {/* Knob / Thumb Slider yang Bergerak Mengikuti Jumlah Karakter */}
-        {charCount > 0 && (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{
-              left: `calc(${progressPercent}% - 6px)`,
-              scale: isMet ? 1.15 : 1,
-            }}
-            transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            className={`absolute z-20 w-3 h-3 rounded-full bg-white border-2 shadow-xs pointer-events-none ${config.thumbBorder}`}
-          />
-        )}
-      </div>
-
-      {/* Status Kecocokan Confirm Password (Khusus Halaman Register / Reset) */}
-      {isConfirmTyped && (
-        <motion.div
-          initial={{ opacity: 0, y: -3 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between text-[10px] mt-1.5"
+      {showConfirm && (
+        <p
+          className={`mt-1 flex items-center gap-1 text-xs ${
+            isMatch ? "text-emerald-700" : "text-rose-600"
+          }`}
         >
-          <span
-            className={`font-medium ${
-              isConfirmMatch ? "text-emerald-700" : "text-rose-600"
-            }`}
-          >
-            {isConfirmMatch
-              ? "✓ Konfirmasi password sudah cocok"
-              : "✕ Konfirmasi password belum cocok"}
-          </span>
-        </motion.div>
+          {isMatch ? (
+            <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
+          ) : (
+            <X className="h-3.5 w-3.5" strokeWidth={2.5} />
+          )}
+          {isMatch ? "Konfirmasi kata sandi cocok" : "Konfirmasi kata sandi belum cocok"}
+        </p>
       )}
     </div>
   );
 }
-

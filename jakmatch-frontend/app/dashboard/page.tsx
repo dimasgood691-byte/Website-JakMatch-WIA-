@@ -61,9 +61,6 @@ export default function ParameterPrioritasPage() {
             {/* Header Tahap 01 */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4">
                 <div className="space-y-1">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#CDFC56] text-slate-900 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider shadow-2xs">
-                        Tahap 01 • Konfigurasi Ruang Kerja
-                    </span>
                     <h2 className="text-lg sm:text-2xl font-extrabold text-white drop-shadow-xs leading-tight">
                         Parameter Dasar & Bobot Prioritas
                     </h2>
@@ -79,10 +76,10 @@ export default function ParameterPrioritasPage() {
 
                 <Link
                     href="/dashboard/komparasi"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-extrabold bg-white hover:bg-slate-50 text-[#0773BC] border border-white/80 shadow-[0_6px_20px_rgba(7,115,188,0.18)] transition shrink-0"
+                    className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-extrabold bg-white hover:bg-[#CDFC56] text-[#161616] border border-white/80 hover:border-[#b6e838] shadow-[0_6px_20px_rgba(7,115,188,0.18)] hover:shadow-[0_10px_26px_rgba(7,115,188,0.28)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CDFC56] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0773BC] transition-all duration-200 ease-out shrink-0"
                 >
                     <span>Lihat Halaman Komparasi</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </Link>
             </div>
 
@@ -91,17 +88,14 @@ export default function ParameterPrioritasPage() {
                 <div className="lg:col-span-5 bg-white/95 backdrop-blur-md rounded-2xl border border-white/80 p-4 sm:p-6 shadow-[0_10px_30px_rgba(7,115,188,0.14)] space-y-5">
                     <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-3">
                         <h3 className="text-sm font-extrabold text-slate-900">
-                            A. Parameter Finansial & Wilayah
+                            Parameter Finansial & Wilayah
                         </h3>
-                        <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-[#0773BC]/10 text-[#0773BC] shrink-0">
-                            {draftFilteredCount} Kandidat Sesuai
-                        </span>
                     </div>
 
                     {/* Langkah 4.1: Pemilihan Konteks Profil */}
                     <div className="space-y-2">
                         <label className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-slate-700">
-                            <span className="w-6 h-6 rounded-lg bg-[#0773BC]/10 flex items-center justify-center text-[#0773BC] shrink-0">
+                            <span className="w-6 h-6 rounded-lg bg-[#C4C4C4]/10 flex items-center justify-center text-[#FFFFF] shrink-0">
                                 <UserCheck className="w-3.5 h-3.5" />
                             </span>
                             1. Konteks Profil Pengguna
@@ -124,17 +118,13 @@ export default function ParameterPrioritasPage() {
                             </option>
                         </select>
                         <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
-                            <span>Acuan Aset Properti:</span>
-                            <span className="font-bold text-[#0773BC] bg-[#0773BC]/10 px-2.5 py-0.5 rounded-md">
-                                {currentProfileConfig.assetLabel}
-                            </span>
                         </div>
                     </div>
 
                     {/* Langkah 4.2: Penyaringan Wilayah */}
                     <div className="space-y-2">
                         <label className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-slate-700">
-                            <span className="w-6 h-6 rounded-lg bg-[#0773BC]/10 flex items-center justify-center text-[#0773BC] shrink-0">
+                            <span className="w-6 h-6 rounded-lg bg-[#C4C4C4]/10 flex items-center justify-center text-[#FFFFF] shrink-0">
                                 <MapPin className="w-3.5 h-3.5" />
                             </span>
                             2. Cakupan Wilayah DKI Jakarta
@@ -158,12 +148,12 @@ export default function ParameterPrioritasPage() {
                     <div className="space-y-3 pt-2 border-t border-slate-100">
                         <div className="flex items-center justify-between gap-2">
                             <label className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-slate-700">
-                                <span className="w-6 h-6 rounded-lg bg-[#0773BC]/10 flex items-center justify-center text-[#0773BC] shrink-0">
+                                <span className="w-6 h-6 rounded-lg bg-[#C4C4C4]/10 flex items-center justify-center text-[#FFFFF] shrink-0">
                                     <Wallet className="w-3.5 h-3.5" />
                                 </span>
                                 3. Batas Anggaran Bulanan
                             </label>
-                            <span className="text-xs font-extrabold text-[#0773BC] bg-[#0773BC]/10 px-2.5 py-0.5 rounded-md">
+                            <span className="text-xs font-extrabold text-[#FFFFFF]/90 bg-[#161616]/90 px-2.5 py-0.5 rounded-md">
                                 {formatRupiah(userBudget)}
                             </span>
                         </div>
@@ -193,11 +183,10 @@ export default function ParameterPrioritasPage() {
                                         key={preset.value}
                                         type="button"
                                         onClick={() => setUserBudget(preset.value)}
-                                        className={`px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold transition cursor-pointer border text-center ${
-                                            isActive
+                                        className={`px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold transition cursor-pointer border text-center ${isActive
                                                 ? "bg-[#CDFC56] text-slate-900 border-[#b6e838] shadow-2xs"
                                                 : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-                                        }`}
+                                            }`}
                                     >
                                         {preset.label}
                                     </button>
@@ -206,15 +195,14 @@ export default function ParameterPrioritasPage() {
                         </div>
 
                         <label
-                            className={`flex items-center justify-between gap-3 p-3.5 rounded-xl border cursor-pointer transition ${
-                                budgetLock
+                            className={`flex items-center justify-between gap-3 p-3.5 rounded-xl border cursor-pointer transition ${budgetLock
                                     ? "bg-[#F4FCE3] border-[#b6e838]"
                                     : "bg-slate-50 border-slate-200 hover:bg-slate-100/80"
-                            }`}
+                                }`}
                         >
                             <div className="min-w-0">
                                 <span className="block text-xs font-extrabold text-slate-900">
-                                    Hanya Tampilkan yang Sesuai Budget (Budget Lock)
+                                    Budget Lock
                                 </span>
                                 <span className="block text-[11px] text-slate-500 mt-0.5 leading-snug">
                                     Sembunyikan kecamatan dengan harga pasar di atas anggaran
@@ -235,12 +223,9 @@ export default function ParameterPrioritasPage() {
                     <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-white/80 p-4 sm:p-6 shadow-[0_10px_30px_rgba(7,115,188,0.14)] space-y-5">
                         <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-slate-100 pb-3">
                             <div className="flex items-center gap-2.5 min-w-0">
-                                <span className="w-7 h-7 rounded-xl bg-[#CDFC56] border border-[#b6e838] flex items-center justify-center text-slate-900 shrink-0">
-                                    <SlidersHorizontal className="w-3.5 h-3.5" />
-                                </span>
                                 <div className="min-w-0">
                                     <h3 className="text-sm font-extrabold text-slate-900 truncate">
-                                        B. Matriks Slider Prioritas ({currentProfileConfig.label})
+                                        Matriks Slider Prioritas ({currentProfileConfig.label})
                                     </h3>
                                     <p className="text-[11px] text-slate-400">
                                         Geser bobot 0% – 100%, lalu tekan tombol Generate Grafik di
@@ -252,10 +237,10 @@ export default function ParameterPrioritasPage() {
                             <button
                                 type="button"
                                 onClick={resetWeightsToDefault}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition cursor-pointer shrink-0"
+                                className="group inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 hover:text-slate-900 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0773BC] focus-visible:ring-offset-2 transition-all duration-200 ease-out cursor-pointer shrink-0"
                                 title="Kembalikan bobot slider ke pengaturan awal"
                             >
-                                <RotateCcw className="w-3 h-3" />
+                                <RotateCcw className="w-3 h-3 transition-transform duration-300 group-hover:-rotate-45 group-active:rotate-0" />
                                 <span>Reset Bobot</span>
                             </button>
                         </div>
@@ -281,11 +266,10 @@ export default function ParameterPrioritasPage() {
                                                         )
                                                     }
                                                     aria-label={`Info indikator ${slider.label}`}
-                                                    className={`p-1 rounded-md transition cursor-pointer shrink-0 ${
-                                                        isGlossaryOpen
+                                                    className={`p-1 rounded-md transition cursor-pointer shrink-0 ${isGlossaryOpen
                                                             ? "bg-[#0773BC] text-white"
                                                             : "text-slate-400 hover:text-[#0773BC] hover:bg-[#0773BC]/10"
-                                                    }`}
+                                                        }`}
                                                 >
                                                     <Info className="w-3.5 h-3.5" />
                                                 </button>
@@ -339,24 +323,37 @@ export default function ParameterPrioritasPage() {
                         </div>
 
                         {/* Area Tombol Eksklusif Generate Grafik Komparasi */}
-                        <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <div className="flex items-start sm:items-center gap-2 text-xs">
+                        <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
+                            <div
+                                role="status"
+                                aria-live="polite"
+                                className={`flex items-start gap-3 rounded-xl border px-3.5 py-3 text-xs sm:max-w-md ${hasUnappliedChanges
+                                        ? "bg-[#0773BC]/5 border-[#0773BC]/15"
+                                        : "bg-emerald-50/80 border-emerald-100"
+                                    }`}
+                            >
                                 {hasUnappliedChanges ? (
                                     <>
-                                        <span className="w-2.5 h-2.5 rounded-full bg-[#0773BC] animate-ping shrink-0 mt-1 sm:mt-0" />
-                                        <span className="font-semibold text-[#0773BC]">
-                                            Parameter diubah — Klik{" "}
-                                            <strong className="font-extrabold">
-                                                Generate Grafik
-                                            </strong>{" "}
-                                            untuk menerapkan.
+                                        <LineChart className="w-4 h-4 text-[#0773BC] shrink-0 mt-0.5" />
+                                        <span className="space-y-0.5">
+                                            <strong className="block font-extrabold text-slate-800">
+                                                Perubahan belum diterapkan
+                                            </strong>
+                                            <span className="block leading-relaxed text-slate-600">
+                                                Generate grafik untuk memperbarui hasil komparasi.
+                                            </span>
                                         </span>
                                     </>
                                 ) : (
                                     <>
-                                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5 sm:mt-0" />
-                                        <span className="font-semibold text-slate-600">
-                                            Grafik & skor komparasi sudah sesuai dengan slider saat ini.
+                                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                                        <span className="space-y-0.5">
+                                            <strong className="block font-extrabold text-emerald-800">
+                                                Semua sudah diperbarui
+                                            </strong>
+                                            <span className="block leading-relaxed text-slate-600">
+                                                Grafik dan skor sesuai dengan parameter saat ini.
+                                            </span>
                                         </span>
                                     </>
                                 )}
@@ -367,27 +364,18 @@ export default function ParameterPrioritasPage() {
                                     type="button"
                                     onClick={generateComparisonGraph}
                                     disabled={isGeneratingGraph}
-                                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:py-2.5 rounded-xl text-xs font-extrabold bg-[#CDFC56] hover:bg-[#b8e840] text-slate-900 border border-[#b6e838] transition cursor-pointer shadow-sm"
+                                    aria-busy={isGeneratingGraph}
+                                    className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs font-extrabold bg-[#CDFC56] hover:bg-[#b8e840] text-slate-900 border border-[#b6e838] shadow-sm hover:shadow-[0_8px_20px_rgba(7,115,188,0.2)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0773BC] focus-visible:ring-offset-2 transition-all duration-200 ease-out cursor-pointer disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:scale-100 disabled:hover:shadow-sm"
                                 >
                                     <Sparkles
-                                        className={`w-4 h-4 ${
-                                            isGeneratingGraph ? "animate-spin" : ""
-                                        }`}
+                                        className={`w-4 h-4 ${isGeneratingGraph ? "animate-spin" : ""
+                                            }`}
                                     />
                                     <span>
                                         {isGeneratingGraph
                                             ? "Mengalkulasi Grafik..."
                                             : "Generate Grafik"}
                                     </span>
-                                </button>
-
-                                <button
-                                    type="button"
-                                    onClick={handleGenerateAndNavigate}
-                                    className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-3 sm:py-2.5 rounded-xl text-xs font-extrabold bg-[#0773BC] hover:bg-[#065f9d] text-white transition cursor-pointer shadow-sm"
-                                >
-                                    <LineChart className="w-4 h-4 text-[#CDFC56]" />
-                                    <span>Generate & Buka Grafik</span>
                                 </button>
                             </div>
                         </div>
@@ -408,10 +396,10 @@ export default function ParameterPrioritasPage() {
                             </div>
                             <Link
                                 href="/dashboard/komparasi"
-                                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-xl bg-[#CDFC56] text-slate-900 text-xs font-extrabold hover:bg-[#b8e840] border border-[#b6e838] transition shrink-0"
+                                className="group w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-xl bg-[#CDFC56] text-slate-900 text-xs font-extrabold hover:bg-[#b8e840] hover:border-[#9fcf2d] hover:shadow-[0_8px_20px_rgba(7,115,188,0.2)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0773BC] focus-visible:ring-offset-2 border border-[#b6e838] transition-all duration-200 ease-out shrink-0"
                             >
                                 <span>Lihat Grafik Lengkap</span>
-                                <ArrowRight className="w-3.5 h-3.5" />
+                                <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
                             </Link>
                         </div>
 
@@ -429,23 +417,21 @@ export default function ParameterPrioritasPage() {
                                 {topThreeDistricts.map((d, index) => (
                                     <div
                                         key={d.id}
-                                        className={`p-4 rounded-xl border space-y-1.5 transition ${
-                                            index === 0
+                                        className={`p-4 rounded-xl border space-y-1.5 transition ${index === 0
                                                 ? "bg-[#F4FCE3] border-[#b6e838] shadow-2xs"
                                                 : "bg-slate-50 border-slate-200/80"
-                                        }`}
+                                            }`}
                                     >
                                         <div className="flex items-center justify-between">
                                             <span
-                                                className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md ${
-                                                    index === 0
+                                                className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md ${index === 0
                                                         ? "bg-[#CDFC56] text-slate-900"
-                                                        : "bg-white text-[#0773BC] border border-slate-200"
-                                                }`}
+                                                        : "bg-[#161616]/90 text-[#FFFFFF]/90 border border-slate-200"
+                                                    }`}
                                             >
                                                 Peringkat #{index + 1}
                                             </span>
-                                            <span className="text-xs font-extrabold text-[#0773BC]">
+                                            <span className="text-xs font-extrabold text-[#161616]">
                                                 {d.finalScore.toFixed(1)}
                                             </span>
                                         </div>

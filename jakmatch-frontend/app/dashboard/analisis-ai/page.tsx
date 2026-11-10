@@ -52,14 +52,72 @@ function formatFileSize(bytes: number): string {
     return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
+function normalizeUnsupportedCssColors(root: HTMLElement): void {
+    const document = root.ownerDocument;
+    const view = document.defaultView;
+    const context = document.createElement("canvas").getContext("2d");
+    if (!view || !context) {
+        throw new Error("Browser tidak mendukung konversi warna untuk ekspor.");
+    }
+
+    const colorFunctionPattern = /\b(?:ok)?(?:lab|lch)\([^)]*\)|\bcolor\([^)]*\)/gi;
+    const colorCache = new Map<string, string>();
+    const normalizeColor = (color: string): string => {
+        const cachedColor = colorCache.get(color);
+        if (cachedColor) return cachedColor;
+
+        context.fillStyle = "rgb(1, 2, 3)";
+        context.fillStyle = color;
+        if (context.fillStyle === "rgb(1, 2, 3)") {
+            throw new Error(`Format warna tidak didukung saat ekspor: ${color}`);
+        }
+        context.fillRect(0, 0, 1, 1);
+        const [red, green, blue, alpha] = context.getImageData(0, 0, 1, 1).data;
+        const normalizedColor =
+            alpha === 255
+                ? `rgb(${red}, ${green}, ${blue})`
+                : `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
+        colorCache.set(color, normalizedColor);
+        return normalizedColor;
+    };
+
+    const elements = [
+        root,
+        ...root.querySelectorAll<HTMLElement | SVGElement>("*"),
+    ];
+    for (const element of elements) {
+        const computedStyle = view.getComputedStyle(element);
+        for (let index = 0; index < computedStyle.length; index += 1) {
+            const property = computedStyle[index];
+            const value = computedStyle.getPropertyValue(property);
+            if (!value || !colorFunctionPattern.test(value)) continue;
+
+            colorFunctionPattern.lastIndex = 0;
+            const normalizedValue = value.replace(
+                colorFunctionPattern,
+                normalizeColor
+            );
+            colorFunctionPattern.lastIndex = 0;
+            element.style.setProperty(property, normalizedValue);
+        }
+    }
+}
+
 function renderFormattedText(raw: string) {
-    const parts = raw.split(/(\*\*[^*]+\*\*)/g);
+    const parts = raw.split(/(\*\*[^*]+\*\*|\*[^*\n]+\*)/g);
     return parts.map((part, idx) => {
         if (part.startsWith("**") && part.endsWith("**")) {
             return (
                 <strong key={idx} className="font-extrabold text-slate-900">
                     {part.slice(2, -2)}
                 </strong>
+            );
+        }
+        if (part.startsWith("*") && part.endsWith("*") && part.length > 2) {
+            return (
+                <em key={idx} className="italic text-slate-700">
+                    {part.slice(1, -1)}
+                </em>
             );
         }
         return <React.Fragment key={idx}>{part}</React.Fragment>;
@@ -73,6 +131,7 @@ export default function AnalisisAiPage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [isExporting, setIsExporting] = useState(false);
+    const [exportError, setExportError] = useState<string | null>(null);
     const [chatMessages, setChatMessages] = useState<ChatMessageItem[]>([]);
     const [inputPrompt, setInputPrompt] = useState("");
     const [pendingAttachments, setPendingAttachments] = useState<
@@ -102,6 +161,19 @@ export default function AnalisisAiPage() {
             weight: appliedConfig.weights[s.key] ?? 50,
         }))
         .sort((a, b) => b.weight - a.weight);
+
+    const firstDistrictName =
+        topThreeDistricts[0]?.district_name || "Peringkat #1";
+    const secondDistrictName =
+        topThreeDistricts[1]?.district_name || "Peringkat #2";
+
+    const dynamicQuickPrompts = [
+        `Kenapa ${firstDistrictName} jadi peringkat #1?`,
+        `Bandingkan ${firstDistrictName} vs ${secondDistrictName}`,
+        "Kalau kerja di Sudirman/Kuningan bagusnya di mana?",
+        "Kalau budget 2,5 juta dapat kecamatan mana?",
+        "Checklist survei lapangan & tips negosiasi sewa",
+    ];
 
     // Auto-scroll ke pesan terbaru saat ada pesan baru
     useEffect(() => {
@@ -313,11 +385,11 @@ export default function AnalisisAiPage() {
                     prev.map((m) =>
                         m.id === assistantMsgId
                             ? {
-                                  ...m,
-                                  content:
-                                      errText ||
-                                      "Maaf, terjadi kendala saat memproses pesan. Silakan coba lagi.",
-                              }
+                                ...m,
+                                content:
+                                    errText ||
+                                    "Maaf, terjadi kendala saat memproses pesan. Silakan coba lagi.",
+                            }
                             : m
                     )
                 );
@@ -345,10 +417,10 @@ export default function AnalisisAiPage() {
                 prev.map((m) =>
                     m.id === assistantMsgId
                         ? {
-                              ...m,
-                              content:
-                                  "Maaf, koneksi terputus saat menghubungi Konsultan AI. Silakan coba kembali.",
-                          }
+                            ...m,
+                            content:
+                                "Maaf, koneksi terputus saat menghubungi Konsultan AI. Silakan coba kembali.",
+                        }
                         : m
                 )
             );
@@ -358,25 +430,61 @@ export default function AnalisisAiPage() {
     };
 
     const handleDownloadPNG = async () => {
-        if (!reportCanvasRef.current) return;
+        if (!reportCanvasRef.current) {
+            setExportError("Konten laporan belum siap untuk diunduh.");
+            return;
+        }
+
         setIsExporting(true);
+        setExportError(null);
         try {
             const html2canvas = (await import("html2canvas")).default;
             const canvas = await html2canvas(reportCanvasRef.current, {
                 scale: 2,
                 backgroundColor: "#FFFFFF",
                 useCORS: true,
+                onclone: (clonedDocument) => {
+                    const clonedReport =
+                        clonedDocument.getElementById("analysis-report-canvas");
+                    if (!clonedReport) {
+                        throw new Error("Konten laporan tidak ditemukan saat ekspor.");
+                    }
+                    Object.assign(clonedReport.style, {
+                        position: "relative",
+                        top: "auto",
+                        left: "auto",
+                        zIndex: "auto",
+                        visibility: "visible",
+                    });
+                    normalizeUnsupportedCssColors(clonedReport);
+                },
             });
-            const dataUrl = canvas.toDataURL("image/png");
+
+            const blob = await new Promise<Blob>((resolve, reject) => {
+                canvas.toBlob((result) => {
+                    if (result) {
+                        resolve(result);
+                    } else {
+                        reject(new Error("Browser gagal membuat file PNG."));
+                    }
+                }, "image/png");
+            });
+            const downloadUrl = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.download = `Laporan-Riset-JakMatch-${appliedConfig.region.replace(
                 /\s+/g,
                 "-"
             )}.png`;
-            link.href = dataUrl;
+            link.href = downloadUrl;
+            document.body.appendChild(link);
             link.click();
+            link.remove();
+            window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
         } catch (err) {
             console.error("Gagal mengekspor laporan PNG:", err);
+            setExportError(
+                "Gagal mengunduh laporan PNG. Silakan coba lagi."
+            );
         } finally {
             setIsExporting(false);
         }
@@ -387,9 +495,6 @@ export default function AnalisisAiPage() {
             {/* Header & Aksi Fase 8 */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#CDFC56] text-slate-900 text-[11px] font-extrabold uppercase tracking-wider shadow-2xs">
-                        Tahap 03 • AI Chatbot Consultant & Ekspor Laporan
-                    </span>
                     <h2 className="text-xl sm:text-2xl font-extrabold text-white drop-shadow-xs mt-1.5">
                         Konsultan AI Interaktif & Laporan Keputusan
                     </h2>
@@ -402,9 +507,9 @@ export default function AnalisisAiPage() {
                 <div className="flex flex-wrap items-center gap-2.5 shrink-0">
                     <Link
                         href="/dashboard/komparasi"
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition"
+                        className="group inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-700 hover:bg-[#CDFC56] hover:border-[#b6e838] hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CDFC56] focus-visible:ring-offset-2 transition-all duration-200 ease-out"
                     >
-                        <ArrowLeft className="w-4 h-4" />
+                        <ArrowLeft className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-0.5" />
                         Kembali ke Grafik
                     </Link>
 
@@ -412,7 +517,7 @@ export default function AnalisisAiPage() {
                         type="button"
                         onClick={handleSaveComparison}
                         disabled={isSaving || topThreeDistricts.length === 0}
-                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-800 hover:bg-slate-50 disabled:opacity-50 transition cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-800 hover:bg-[#CDFC56] hover:border-[#b6e838] hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CDFC56] focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:scale-100 disabled:hover:shadow-none transition-all duration-200 ease-out cursor-pointer"
                     >
                         <BookmarkCheck className="w-4 h-4 text-slate-900" />
                         {isSaving ? "Menyimpan..." : "Simpan Hasil Riset"}
@@ -427,11 +532,448 @@ export default function AnalisisAiPage() {
                         <Download className="w-4 h-4" />
                         {isExporting ? "Mengekspor PNG..." : "Unduh Laporan (PNG)"}
                     </button>
+                    {exportError && (
+                        <p role="alert" className="w-full text-xs text-red-100">
+                            {exportError}
+                        </p>
+                    )}
                 </div>
             </div>
 
             {/* ===================================================== */}
-            {/* BAGIAN 1: CHATBOT MULTIMODAL KONSULTAN AI JAKMATCH    */}
+            {/* BAGIAN 1: KANVAS LAPORAN RESMI (UNTUK UNDUH PNG)      */}
+            {/* ===================================================== */}
+            <div
+                className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 lg:p-8 shadow-xs space-y-6"
+            >
+                <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                    <div>
+                        <h3 className="text-lg font-extrabold text-slate-900 mt-1">
+                            Rekomendasi Wilayah: {appliedProfileConfig.label}
+                        </h3>
+                        <p className="text-xs text-slate-500">
+                            Cakupan: {appliedConfig.region} • Target Aset:{" "}
+                            {appliedProfileConfig.assetLabel} • Anggaran:{" "}
+                            {formatRupiah(appliedConfig.budget)}/bln
+                        </p>
+                    </div>
+                </div>
+
+                {/* Ringkasan Kesimpulan AI di dalam Kanvas Laporan */}
+                <div className="p-4 rounded-xl bg-[#CDFC56]/20 border border-[#b8e840] space-y-1.5">
+                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-900">
+                        Kesimpulan Konsultan AI ({appliedProfileConfig.personaBadge})
+                    </span>
+                    <p className="text-xs sm:text-sm text-slate-800 leading-relaxed whitespace-pre-line">
+                        {aiNarrative ||
+                            "Klik Analisis Ulang di atas untuk menyusun narasi laporan."}
+                    </p>
+                </div>
+
+                {/* Ringkasan Grafik & 3 Kartu Pemenang di dalam Kanvas Laporan */}
+                {topThreeDistricts.length > 0 && (
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center pt-1">
+                        <div className="lg:col-span-7 border border-slate-100 rounded-2xl p-4">
+                            <InteractiveRadarChart
+                                districts={topThreeDistricts}
+                                axes={appliedProfileConfig.sliders}
+                            />
+                        </div>
+
+                        <div className="lg:col-span-5 space-y-3">
+                            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                Ringkasan Top 3 Kandidat Kecamatan
+                            </h4>
+                            {topThreeDistricts.map((d, idx) => (
+                                <div
+                                    key={d.id}
+                                    className={`p-4 rounded-xl border flex items-center justify-between ${idx === 0
+                                        ? "bg-[#CDFC56]/30 border-[#b5e43b]"
+                                        : "bg-slate-50 border-slate-200/80"
+                                        }`}
+                                >
+                                    <div>
+                                        <span className="inline-block px-2 py-0.5 rounded bg-[#CDFC56] text-slate-900 text-[10px] font-extrabold uppercase">
+                                            Peringkat #{idx + 1} • {d.city_region}
+                                        </span>
+                                        <p className="text-sm font-extrabold text-slate-900 mt-1">
+                                            {d.district_name}
+                                        </p>
+                                        <p className="text-xs text-slate-500">
+                                            Estimasi: {formatRupiah(d.estimatedCost)}/bln (
+                                            {d.isUnderBudget ? "Underbudget" : "Overbudget"})
+                                        </p>
+                                    </div>
+                                    <div className="text-right">
+                                        <span className="block text-[10px] text-slate-400">
+                                            Skor
+                                        </span>
+                                        <span className="text-base font-extrabold text-slate-900">
+                                            {d.finalScore.toFixed(1)}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <div
+                id="analysis-report-canvas"
+                ref={reportCanvasRef}
+                aria-hidden="true"
+                style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    zIndex: -1,
+                    visibility: "hidden",
+                    width: 1120,
+                    boxSizing: "border-box",
+                    padding: 52,
+                    backgroundColor: "#FFFFFF",
+                    color: "#0B1526",
+                    fontFamily: "Arial, Helvetica, sans-serif",
+                }}
+            >
+                <header
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        paddingBottom: 28,
+                        borderBottom: "2px solid #E8EEF4",
+                    }}
+                >
+                    <div>
+                        <div
+                            style={{
+                                color: "#0773BC",
+                                fontSize: 13,
+                                fontWeight: 800,
+                                letterSpacing: 2,
+                                textTransform: "uppercase",
+                            }}
+                        >
+                            JakMatch • Spatial Insight
+                        </div>
+                        <h1
+                            style={{
+                                margin: "12px 0 6px",
+                                fontSize: 32,
+                                lineHeight: 1.2,
+                                fontWeight: 800,
+                                color: "#0B1526",
+                            }}
+                        >
+                            Laporan Rekomendasi Wilayah
+                        </h1>
+                        <p style={{ margin: 0, fontSize: 15, color: "#64748B" }}>
+                            Analisis pilihan kawasan berdasarkan kebutuhan dan prioritas Anda
+                        </p>
+                    </div>
+                    <div
+                        style={{
+                            padding: "10px 16px",
+                            borderRadius: 999,
+                            backgroundColor: "#F1F8DD",
+                            color: "#365314",
+                            fontSize: 13,
+                            fontWeight: 700,
+                            whiteSpace: "nowrap",
+                        }}
+                    >
+                        {appliedProfileConfig.personaBadge}
+                    </div>
+                </header>
+
+                <section
+                    style={{
+                        display: "flex",
+                        gap: 14,
+                        marginTop: 26,
+                    }}
+                >
+                    {[
+                        {
+                            label: "PROFIL KEBUTUHAN",
+                            value: appliedProfileConfig.label,
+                        },
+                        {
+                            label: "JENIS PROPERTI",
+                            value: appliedProfileConfig.assetLabel,
+                        },
+                        {
+                            label: "ANGGARAN BULANAN",
+                            value: formatRupiah(appliedConfig.budget),
+                        },
+                        {
+                            label: "CAKUPAN WILAYAH",
+                            value: appliedConfig.region,
+                        },
+                    ].map((item) => (
+                        <div
+                            key={item.label}
+                            style={{
+                                flex: 1,
+                                minWidth: 0,
+                                padding: "16px 18px",
+                                border: "1px solid #E2E8F0",
+                                borderRadius: 14,
+                                backgroundColor: "#F8FAFC",
+                            }}
+                        >
+                            <div
+                                style={{
+                                    marginBottom: 8,
+                                    color: "#64748B",
+                                    fontSize: 10,
+                                    fontWeight: 800,
+                                    letterSpacing: 0.8,
+                                }}
+                            >
+                                {item.label}
+                            </div>
+                            <div
+                                style={{
+                                    color: "#0B1526",
+                                    fontSize: 14,
+                                    lineHeight: 1.4,
+                                    fontWeight: 700,
+                                }}
+                            >
+                                {item.value}
+                            </div>
+                        </div>
+                    ))}
+                </section>
+
+                <section
+                    style={{
+                        marginTop: 24,
+                        padding: "22px 26px",
+                        borderRadius: 16,
+                        backgroundColor: "#0B1526",
+                        borderLeft: "6px solid #CDFC56",
+                    }}
+                >
+                    <div
+                        style={{
+                            marginBottom: 10,
+                            color: "#CDFC56",
+                            fontSize: 12,
+                            fontWeight: 800,
+                            letterSpacing: 1,
+                            textTransform: "uppercase",
+                        }}
+                    >
+                        Kesimpulan Konsultan AI
+                    </div>
+                    <p
+                        style={{
+                            margin: 0,
+                            color: "#F8FAFC",
+                            fontSize: 15,
+                            lineHeight: 1.7,
+                            whiteSpace: "pre-line",
+                        }}
+                    >
+                        {aiNarrative ||
+                            "Belum ada kesimpulan. Jalankan analisis ulang untuk membuat rekomendasi."}
+                    </p>
+                </section>
+
+                <section style={{ marginTop: 30 }}>
+                    <div style={{ marginBottom: 14 }}>
+                        <h2
+                            style={{
+                                margin: 0,
+                                color: "#0B1526",
+                                fontSize: 20,
+                                fontWeight: 800,
+                            }}
+                        >
+                            Tiga Rekomendasi Teratas
+                        </h2>
+                        <p
+                            style={{
+                                margin: "5px 0 0",
+                                color: "#64748B",
+                                fontSize: 13,
+                            }}
+                        >
+                            Perbandingan skor akhir dan estimasi biaya bulanan
+                        </p>
+                    </div>
+                    <div style={{ display: "flex", gap: 14 }}>
+                        {topThreeDistricts.map((district, index) => {
+                            const score = Math.max(
+                                0,
+                                Math.min(100, district.finalScore)
+                            );
+                            const isTopChoice = index === 0;
+                            return (
+                                <article
+                                    key={district.id}
+                                    style={{
+                                        flex: 1,
+                                        minWidth: 0,
+                                        padding: 20,
+                                        border: `1px solid ${
+                                            isTopChoice ? "#B8E840" : "#E2E8F0"
+                                        }`,
+                                        borderRadius: 16,
+                                        backgroundColor: isTopChoice
+                                            ? "#F7FCEB"
+                                            : "#FFFFFF",
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "center",
+                                            marginBottom: 18,
+                                        }}
+                                    >
+                                        <span
+                                            style={{
+                                                padding: "6px 10px",
+                                                borderRadius: 999,
+                                                backgroundColor: isTopChoice
+                                                    ? "#CDFC56"
+                                                    : "#EFF6FF",
+                                                color: "#0B1526",
+                                                fontSize: 11,
+                                                fontWeight: 800,
+                                            }}
+                                        >
+                                            PERINGKAT #{index + 1}
+                                        </span>
+                                        <span
+                                            style={{
+                                                color: "#64748B",
+                                                fontSize: 12,
+                                            }}
+                                        >
+                                            {district.city_region}
+                                        </span>
+                                    </div>
+                                    <h3
+                                        style={{
+                                            margin: "0 0 16px",
+                                            color: "#0B1526",
+                                            fontSize: 21,
+                                            lineHeight: 1.25,
+                                            fontWeight: 800,
+                                        }}
+                                    >
+                                        {district.district_name}
+                                    </h3>
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "baseline",
+                                            marginBottom: 8,
+                                        }}
+                                    >
+                                        <span style={{ color: "#64748B", fontSize: 12 }}>
+                                            Skor kecocokan
+                                        </span>
+                                        <strong
+                                            style={{
+                                                color: "#0B1526",
+                                                fontSize: 19,
+                                            }}
+                                        >
+                                            {district.finalScore.toFixed(1)}
+                                        </strong>
+                                    </div>
+                                    <div
+                                        style={{
+                                            height: 8,
+                                            overflow: "hidden",
+                                            borderRadius: 999,
+                                            backgroundColor: "#E2E8F0",
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                width: `${score}%`,
+                                                height: "100%",
+                                                borderRadius: 999,
+                                                backgroundColor: isTopChoice
+                                                    ? "#0773BC"
+                                                    : "#38BDF8",
+                                            }}
+                                        />
+                                    </div>
+                                    <div
+                                        style={{
+                                            marginTop: 18,
+                                            paddingTop: 14,
+                                            borderTop: "1px solid #E2E8F0",
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                color: "#64748B",
+                                                fontSize: 11,
+                                            }}
+                                        >
+                                            ESTIMASI BIAYA / BULAN
+                                        </div>
+                                        <div
+                                            style={{
+                                                marginTop: 5,
+                                                color: "#0B1526",
+                                                fontSize: 16,
+                                                fontWeight: 800,
+                                            }}
+                                        >
+                                            {formatRupiah(district.estimatedCost)}
+                                        </div>
+                                        <div
+                                            style={{
+                                                marginTop: 8,
+                                                color: district.isUnderBudget
+                                                    ? "#15803D"
+                                                    : "#B45309",
+                                                fontSize: 12,
+                                                fontWeight: 700,
+                                            }}
+                                        >
+                                            {district.isUnderBudget
+                                                ? "Sesuai anggaran"
+                                                : "Melebihi anggaran"}
+                                        </div>
+                                    </div>
+                                </article>
+                            );
+                        })}
+                    </div>
+                </section>
+
+                <footer
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginTop: 28,
+                        paddingTop: 16,
+                        borderTop: "1px solid #E2E8F0",
+                        color: "#94A3B8",
+                        fontSize: 11,
+                    }}
+                >
+                    <span>JakMatch • Rekomendasi berdasarkan preferensi pengguna</span>
+                    <span>Skor adalah estimasi kecocokan relatif, bukan jaminan hasil</span>
+                </footer>
+            </div>
+
+            {/* ===================================================== */}
+            {/* BAGIAN 2: CHATBOT MULTIMODAL KONSULTAN AI JAKMATCH    */}
             {/* ===================================================== */}
             <div
                 onDragOver={(e) => {
@@ -444,11 +986,10 @@ export default function AnalisisAiPage() {
                     setIsDraggingOver(false);
                     void processSelectedFiles(e.dataTransfer.files);
                 }}
-                className={`bg-white rounded-2xl border transition-all shadow-sm overflow-hidden flex flex-col ${
-                    isDraggingOver
-                        ? "border-slate-900 ring-4 ring-[#CDFC56]"
-                        : "border-slate-200"
-                }`}
+                className={`bg-white rounded-2xl border transition-all shadow-sm overflow-hidden flex flex-col ${isDraggingOver
+                    ? "border-slate-900 ring-4 ring-[#CDFC56]"
+                    : "border-slate-200"
+                    }`}
             >
                 {/* Header Chatbot */}
                 <div className="px-5 py-4 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-3">
@@ -463,7 +1004,7 @@ export default function AnalisisAiPage() {
                                 </h3>
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#CDFC56] text-slate-900">
                                     <span className="w-1.5 h-1.5 rounded-full bg-slate-900 animate-pulse" />
-                                    Multimodal Ready
+                                    Ready
                                 </span>
                             </div>
                             <p className="text-[11px] text-slate-300">
@@ -491,11 +1032,10 @@ export default function AnalisisAiPage() {
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-extrabold bg-[#CDFC56] text-slate-900 hover:bg-[#b8e840] disabled:opacity-50 transition cursor-pointer"
                         >
                             <RefreshCw
-                                className={`w-3.5 h-3.5 ${
-                                    isAiStreaming ? "animate-spin" : ""
-                                }`}
+                                className={`w-3.5 h-3.5 ${isAiStreaming ? "animate-spin" : ""
+                                    }`}
                             />
-                             Analisis Ulang
+                            Analisis Ulang
                         </button>
                     </div>
                 </div>
@@ -511,11 +1051,10 @@ export default function AnalisisAiPage() {
                     {sortedPriorities.slice(0, 3).map((p, idx) => (
                         <span
                             key={p.key}
-                            className={`px-2 py-0.5 rounded-md font-bold border ${
-                                idx === 0
-                                    ? "bg-[#CDFC56]/55 border-[#b2e23b] text-slate-900"
-                                    : "bg-white border-slate-200 text-slate-700"
-                            }`}
+                            className={`px-2 py-0.5 rounded-md font-bold border ${idx === 0
+                                ? "bg-[#CDFC56]/55 border-[#b2e23b] text-slate-900"
+                                : "bg-white border-slate-200 text-slate-700"
+                                }`}
                         >
                             {p.shortLabel}: {p.weight}%
                         </span>
@@ -562,16 +1101,14 @@ export default function AnalisisAiPage() {
                         return (
                             <div
                                 key={msg.id}
-                                className={`flex items-start gap-3 ${
-                                    isUser ? "flex-row-reverse" : ""
-                                }`}
+                                className={`flex items-start gap-3 ${isUser ? "flex-row-reverse" : ""
+                                    }`}
                             >
                                 <div
-                                    className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
-                                        isUser
-                                            ? "bg-slate-900 text-[#CDFC56]"
-                                            : "bg-[#CDFC56] border border-[#b2e23b] text-slate-900"
-                                    }`}
+                                    className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${isUser
+                                        ? "bg-slate-900 text-[#CDFC56]"
+                                        : "bg-[#CDFC56] border border-[#b2e23b] text-slate-900"
+                                        }`}
                                 >
                                     {isUser ? (
                                         <User className="w-4 h-4" />
@@ -581,11 +1118,10 @@ export default function AnalisisAiPage() {
                                 </div>
 
                                 <div
-                                    className={`max-w-[85%] sm:max-w-[78%] rounded-2xl p-4 shadow-2xs space-y-2.5 ${
-                                        isUser
-                                            ? "bg-slate-900 text-white rounded-tr-xs"
-                                            : "bg-white text-slate-800 border border-slate-200 rounded-tl-xs"
-                                    }`}
+                                    className={`max-w-[85%] sm:max-w-[78%] rounded-2xl p-4 shadow-2xs space-y-2.5 ${isUser
+                                        ? "bg-slate-900 text-white rounded-tr-xs"
+                                        : "bg-white text-slate-800 border border-slate-200 rounded-tl-xs"
+                                        }`}
                                 >
                                     {/* Lampiran Foto atau Dokumen pada Bubble Pesan */}
                                     {msg.attachments && msg.attachments.length > 0 && (
@@ -651,11 +1187,10 @@ export default function AnalisisAiPage() {
                                     </div>
 
                                     <div
-                                        className={`text-[10px] ${
-                                            isUser
-                                                ? "text-slate-400 text-right"
-                                                : "text-slate-400"
-                                        }`}
+                                        className={`text-[10px] ${isUser
+                                            ? "text-slate-400 text-right"
+                                            : "text-slate-400"
+                                            }`}
                                     >
                                         {msg.timestamp}
                                     </div>
@@ -671,17 +1206,19 @@ export default function AnalisisAiPage() {
                     <span className="text-[11px] font-bold text-slate-400 shrink-0">
                         Tanya Cepat:
                     </span>
-                    {QUICK_PROMPTS.map((q) => (
-                        <button
-                            key={q}
-                            type="button"
-                            disabled={isChatLoading}
-                            onClick={() => void handleSendMessage(q)}
-                            className="px-3 py-1 rounded-full text-[11px] font-bold bg-slate-100 hover:bg-[#CDFC56] text-slate-700 hover:text-slate-900 transition cursor-pointer shrink-0 disabled:opacity-50"
-                        >
-                            {q}
-                        </button>
-                    ))}
+                        {
+                            dynamicQuickPrompts.map((q) => (
+                                <button
+                                    key={q}
+                                    type="button"
+                                    disabled={isChatLoading}
+                                    onClick={() => void handleSendMessage(q)}
+                                    className="px-3 py-1 rounded-full text-[11px] font-bold bg-slate-100 hover:bg-[#CDFC56] text-slate-700 hover:text-slate-900 transition cursor-pointer shrink-0 disabled:opacity-50"
+                                >
+                                    {q}
+                                </button>
+                            ))
+                        }
                 </div>
 
                 {/* Pratinjau Lampiran Foto / File Sebelum Dikirim */}
@@ -812,90 +1349,6 @@ export default function AnalisisAiPage() {
                         <span>Kirim</span>
                     </button>
                 </form>
-            </div>
-
-            {/* ===================================================== */}
-            {/* BAGIAN 2: KANVAS LAPORAN RESMI (UNTUK UNDUH PNG)      */}
-            {/* ===================================================== */}
-            <div
-                ref={reportCanvasRef}
-                className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 lg:p-8 shadow-xs space-y-6"
-            >
-                <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
-                    <div>
-                        <span className="inline-block px-2.5 py-0.5 rounded bg-[#CDFC56] text-slate-900 text-[10px] font-extrabold uppercase tracking-wider">
-                            Kanvas Laporan Keputusan Lokasi JakMatch
-                        </span>
-                        <h3 className="text-lg font-extrabold text-slate-900 mt-1">
-                            Rekomendasi Wilayah: {appliedProfileConfig.label}
-                        </h3>
-                        <p className="text-xs text-slate-500">
-                            Cakupan: {appliedConfig.region} • Target Aset:{" "}
-                            {appliedProfileConfig.assetLabel} • Anggaran:{" "}
-                            {formatRupiah(appliedConfig.budget)}/bln
-                        </p>
-                    </div>
-                </div>
-
-                {/* Ringkasan Kesimpulan AI di dalam Kanvas Laporan */}
-                <div className="p-4 rounded-xl bg-[#CDFC56]/20 border border-[#b8e840] space-y-1.5">
-                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-900">
-                        Kesimpulan Konsultan AI ({appliedProfileConfig.personaBadge})
-                    </span>
-                    <p className="text-xs sm:text-sm text-slate-800 leading-relaxed whitespace-pre-line">
-                        {aiNarrative ||
-                            "Klik Analisis Ulang di atas untuk menyusun narasi laporan."}
-                    </p>
-                </div>
-
-                {/* Ringkasan Grafik & 3 Kartu Pemenang di dalam Kanvas Laporan */}
-                {topThreeDistricts.length > 0 && (
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center pt-1">
-                        <div className="lg:col-span-7 border border-slate-100 rounded-2xl p-4">
-                            <InteractiveRadarChart
-                                districts={topThreeDistricts}
-                                axes={appliedProfileConfig.sliders}
-                            />
-                        </div>
-
-                        <div className="lg:col-span-5 space-y-3">
-                            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                                Ringkasan Top 3 Kandidat Kecamatan
-                            </h4>
-                            {topThreeDistricts.map((d, idx) => (
-                                <div
-                                    key={d.id}
-                                    className={`p-4 rounded-xl border flex items-center justify-between ${
-                                        idx === 0
-                                            ? "bg-[#CDFC56]/30 border-[#b5e43b]"
-                                            : "bg-slate-50 border-slate-200/80"
-                                    }`}
-                                >
-                                    <div>
-                                        <span className="inline-block px-2 py-0.5 rounded bg-[#CDFC56] text-slate-900 text-[10px] font-extrabold uppercase">
-                                            Peringkat #{idx + 1} • {d.city_region}
-                                        </span>
-                                        <p className="text-sm font-extrabold text-slate-900 mt-1">
-                                            {d.district_name}
-                                        </p>
-                                        <p className="text-xs text-slate-500">
-                                            Estimasi: {formatRupiah(d.estimatedCost)}/bln (
-                                            {d.isUnderBudget ? "Underbudget" : "Overbudget"})
-                                        </p>
-                                    </div>
-                                    <div className="text-right">
-                                        <span className="block text-[10px] text-slate-400">
-                                            Skor
-                                        </span>
-                                        <span className="text-base font-extrabold text-slate-900">
-                                            {d.finalScore.toFixed(1)}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
             </div>
 
             <div className="flex justify-end">

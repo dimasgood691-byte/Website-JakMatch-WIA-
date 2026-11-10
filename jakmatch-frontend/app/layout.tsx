@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "JakMatch",
   description: "-",
+  icons: {
+    icon: "/assets/logo-jakmatch.png?v=2",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
