@@ -213,7 +213,11 @@ export default function Home() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             // Memperbarui state secara otomatis tanpa perlu diklik
-            if (entry.target.id === "home" || entry.target.id === "features") {
+            if (
+              entry.target.id === "home" ||
+              entry.target.id === "features" ||
+              entry.target.id === "peta"
+            ) {
               setActiveSection(entry.target.id);
             }
           }
@@ -224,13 +228,16 @@ export default function Home() {
 
     const homeSec = document.getElementById("home");
     const featuresSec = document.getElementById("features");
+    const mapSec = document.getElementById("peta");
 
     if (homeSec) observer.observe(homeSec);
     if (featuresSec) observer.observe(featuresSec);
+    if (mapSec) observer.observe(mapSec);
 
     return () => {
       if (homeSec) observer.unobserve(homeSec);
       if (featuresSec) observer.unobserve(featuresSec);
+      if (mapSec) observer.unobserve(mapSec);
     };
   }, []);
 
@@ -357,7 +364,7 @@ export default function Home() {
 
         <div className="hidden md:flex items-center bg-[#E5E5E5] rounded-full p-1.5 shadow-sm">
           <Link
-            href="/#home"
+            href="#home"
             className={`px-5 py-1.5 rounded-full text-xs font-bold tracking-wide transition-all duration-300 ${activeSection === "home"
               ? "bg-black text-white shadow-md"
               : "text-gray-900 hover:bg-black/5"
@@ -366,7 +373,7 @@ export default function Home() {
             BERANDA
           </Link>
           <Link
-            href="/#features"
+            href="#features"
             className={`px-5 py-1.5 rounded-full text-xs font-bold tracking-wide transition-all duration-300 ${activeSection === "features"
               ? "bg-black text-white shadow-md"
               : "text-gray-900 hover:bg-black/5"
@@ -375,7 +382,7 @@ export default function Home() {
             FITUR
           </Link>
           <Link
-            href="/#peta"
+            href="#peta"
             className={`px-5 py-1.5 rounded-full text-xs font-bold tracking-wide transition-all duration-300 ${activeSection === "peta"
               ? "bg-black text-white shadow-md"
               : "text-gray-900 hover:bg-black/5"
