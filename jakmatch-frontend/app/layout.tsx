@@ -15,7 +15,14 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "JakMatch",
   description:
-    "Platform cerdas berbasis data untuk rekomendasi lokasi hunian dan ekspansi bisnis di DKI Jakarta."
+    "Platform cerdas berbasis data untuk rekomendasi lokasi hunian dan ekspansi bisnis di DKI Jakarta.",
+  icons: {
+    icon: [
+      { url: "/assets/logo-jakmatch.png?v=3", type: "image/png" },
+    ],
+    shortcut: "/assets/logo-jakmatch.png?v=3",
+    apple: "/assets/logo-jakmatch.png?v=3",
+  },
 };
 
 export default function RootLayout({
