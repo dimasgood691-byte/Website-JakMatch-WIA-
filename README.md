@@ -2,8 +2,6 @@
 
 JakMatch adalah platform web data-driven yang dirancang untuk membantu warga DKI Jakarta dan pelaku UMKM dalam memilih lokasi huni atau area bisnis secara presisi. Platform ini mengintegrasikan statistik kecamatan, filter wilayah, kalkulator anggaran mandiri, grafik radar komparatif, serta analisis berbasis kecerdasan buatan (_Generative AI_).
 
-## Fitur & Keunggulan (Fungsi & Kelebihan)
-
 ### Fungsi Utama (Core Features)
 
 1. **Pencarian & Rekomendasi Wilayah Berbasis Data:** Membantu pengguna memfilter kecamatan di DKI Jakarta berdasarkan preferensi anggaran, wilayah kota, dan kebutuhan gaya hidup.
@@ -56,7 +54,10 @@ Ikuti langkah-langkah di bawah ini untuk menjalankan proyek secara local:
 
 ```bash
 git clone https://github.com/dimasgood691-byte/Website-JakMatch-WIA-.git
-cd Website-JakMatch-WIA-
+```
+
+```bash
+cd Website-JakMatch-WIA-cd Website-JakMatch-WIA-
 ```
 
 ### 2. Buat Database di PostgreSQL
@@ -77,7 +78,6 @@ Buat File bernama ![Status](https://img.shields.io/badge/.env-yellow?style=flat-
 - DB_SSLMODE=disable
 - PORT=8080
 - JWT_SECRET=C1AF6FFBACD1CA49E383E3CA70F6972A005600912721FD835EAAE5CDB0D3E73D
-
 - FIREBASE_CREDENTIALS_PATH=serviceAccountKey.json
 - APP_BASE_URL=http://localhost:3000
 - SMTP_HOST=smtp.gmail.com
@@ -86,10 +86,19 @@ Buat File bernama ![Status](https://img.shields.io/badge/.env-yellow?style=flat-
 - SMTP_PASSWORD=app-password-gmail
 - SMTP_FROM="JakMatch <alamat-pengirim@gmail.com>"
 
+Buat file bernama ![Status](https://img.shields.io/badge/serviceAccountKey.json-yellow?style=flat-square) di folder jakmatch-backend yang berisikan :
+Sesuai dengan isi di dokumen data Environment.
+
 ```bash
 cd jakmatch-backend
-# Pastikan file .env sudah dikonfigurasi dengan database PostgreSQL lokalmu
+# Pastikan file .env dan serviceAccountKey.json sudah dikonfigurasi dengan database PostgreSQL lokalmu
+```
+
+```bash
 go mod tidy
+```
+
+```bash
 go run main.go
 # Backend Run di port 8080
 ```
@@ -99,7 +108,6 @@ go run main.go
 Buat File bernama ![Status](https://img.shields.io/badge/.env.local-yellow?style=flat-square) di folder jakmatch-frontend yang berisikan :
 
 - NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
-
 - NEXT_PUBLIC_FIREBASE_API_KEY=isi_api_key_firebase_kamu
 - NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=jakmatch-xxxx.firebaseapp.com
 - NEXT_PUBLIC_FIREBASE_PROJECT_ID=jakmatch-xxxx
@@ -109,7 +117,13 @@ Buat File bernama ![Status](https://img.shields.io/badge/.env.local-yellow?style
 
 ```bash
 cd jakmatch-frontend
+```
+
+```bash
 npm install
+```
+
+```bash
 npm run dev
 ```
 
@@ -123,4 +137,4 @@ npm run dev
 - ✅ **Riwayat Perbandingan & AI Synthesizer:** Pembuatan *endpoint* API untuk menyimpan hasil analisis perbandingan wilayah (`saved_comparisons`) yang siap dihubungkan dengan *Generative AI*[cite: 3, 6].
 - ✅ **Antarmuka Pengguna (UI/UX):** Pembuatan *Landing Page*, halaman *Register*, *Login*, dan *Dashboard* yang responsif.
 - ✅ **Penyempurnaan Analisis AI:** Pembaruan alur analisis dan endpoint agar hasil analisis lebih terintegrasi dengan data wilayah.
-- 🔄 **Pengujian Integrasi:** Verifikasi alur autentikasi, analisis wilayah, komparasi, dan penyimpanan riwayat dari frontend hingga backend.
+- ✅ **Pengujian Integrasi:** Verifikasi alur autentikasi, analisis wilayah, komparasi, dan penyimpanan riwayat dari frontend hingga backend.
