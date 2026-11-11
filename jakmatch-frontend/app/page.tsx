@@ -376,9 +376,12 @@ export default function Home() {
           </Link>
           <Link
             href="/#peta"
-            className="text-gray-900 px-5 py-1.5 rounded-full text-xs font-bold hover:bg-black/5 transition tracking-wide"
+            className={`px-5 py-1.5 rounded-full text-xs font-bold tracking-wide transition-all duration-300 ${activeSection === "features"
+              ? "bg-black text-white shadow-md"
+              : "text-gray-900 hover:bg-black/5"
+              }`}
           >
-            PETA LANDING
+            PETA JAKARTA
           </Link>
         </div>
 
