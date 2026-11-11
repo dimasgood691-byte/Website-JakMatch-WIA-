@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
+import { ArrowUp } from "lucide-react";
 
 // Daftar kartu fitur Dashboard untuk 3D Curved Carousel di Hero Section
 const DASHBOARD_CARDS = [
@@ -55,6 +57,7 @@ const JAKARTA_REGIONS = [
     index: "01",
     code: "ID-JK-UTR",
     name: "Jakarta Utara",
+    hoverColor: "rgba(30, 58, 138, 0.85)", // Royal Navy (Biru Tua)
     area: "146,66 km²",
     summary:
       "Kawasan pesisir dengan perkembangan infrastruktur mandiri yang pesat. Didominasi hunian vertikal modern, pusat kuliner, dan akses langsung menuju jalur tol lingkar luar.",
@@ -74,6 +77,7 @@ const JAKARTA_REGIONS = [
     index: "02",
     code: "ID-JK-BRT",
     name: "Jakarta Barat",
+    hoverColor: "rgba(245, 158, 11, 0.85)", // Golden Amber (Kuning Emas)
     area: "129,54 km²",
     summary:
       "Titik temu kawasan pendidikan tinggi, pusat komersial, dan pemukiman padat yang hidup. Sangat ideal bagi mahasiswa maupun pekerja dengan mobilitas tinggi ke arah bandara.",
@@ -98,6 +102,7 @@ const JAKARTA_REGIONS = [
     index: "03",
     code: "ID-JK-PST",
     name: "Jakarta Pusat",
+    hoverColor: "rgba(153, 27, 27, 0.85)", // Crimson (Merah Tua)
     area: "48,13 km²",
     summary:
       "Simpul utama transportasi publik (MRT, KRL, LRT, TransJakarta) dan pusat pemerintahan. Menawarkan efisiensi waktu tempuh terbaik bagi pekerja di kawasan bisnis utama.",
@@ -117,6 +122,7 @@ const JAKARTA_REGIONS = [
     index: "04",
     code: "ID-JK-SLT",
     name: "Jakarta Selatan",
+    hoverColor: "rgba(4, 120, 87, 0.85)", // Emerald (Hijau Tua)
     area: "141,27 km²",
     summary:
       "Perpaduan distrik bisnis modern (SCBD), ruang terbuka hijau yang teduh, serta pusat tren kreatif. Pilihan utama untuk keseimbangan antara karier dan kualitas tempat tinggal.",
@@ -136,6 +142,7 @@ const JAKARTA_REGIONS = [
     index: "05",
     code: "ID-JK-TMR",
     name: "Jakarta Timur",
+    hoverColor: "rgba(249, 115, 22, 0.85)", // Sunset (Oren)
     area: "188,03 km²",
     summary:
       "Wilayah dengan rasio ruang keluarga terluas dan biaya hidup yang paling rasional. Kini semakin terkoneksi berkat kehadiran jalur LRT Jabodebek dan koridor TransJakarta.",
@@ -176,41 +183,98 @@ const createAos = (direction: AosDirection, delay = 0, duration = 0.85) => {
 };
 
 export default function Home() {
+  const pathname = usePathname();
+
+  // SATU DEKLARASI SAJA: State untuk mendeteksi posisi navbar saat ini
+  const [activeSection, setActiveSection] = useState("home");
   const [isScrolling, setIsScrolling] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState(JAKARTA_REGIONS[3]);
   const [hoveredRegionId, setHoveredRegionId] = useState<string | null>(null);
-  const mainRef = useRef<HTMLDivElement>(null);
 
-  // Refs untuk animasi 3D Curved Carousel di Hero Section
+  const mainRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const isCarouselPausedRef = useRef(false);
 
+  // Fungsi scroll halus ke halaman utama (paling atas)
+  const scrollToTop = () => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  // 1. Hook untuk mendeteksi posisi Scroll (Active State)
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Memperbarui state secara otomatis tanpa perlu diklik
+            if (entry.target.id === "home" || entry.target.id === "features") {
+              setActiveSection(entry.target.id);
+            }
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    const homeSec = document.getElementById("home");
+    const featuresSec = document.getElementById("features");
+
+    if (homeSec) observer.observe(homeSec);
+    if (featuresSec) observer.observe(featuresSec);
+
+    return () => {
+      if (homeSec) observer.unobserve(homeSec);
+      if (featuresSec) observer.unobserve(featuresSec);
+    };
+  }, []);
+
+  // 2. Hook untuk menyembunyikan Navbar & menampilkan tombol Scroll to Top
   useEffect(() => {
     let scrollTimeout: NodeJS.Timeout;
 
     const handleScroll = () => {
+      // 1. Efek sembunyikan navbar sementara saat scrolling
       setIsScrolling(true);
       clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => {
         setIsScrolling(false);
       }, 300);
+
+      // 2. Tampilkan tombol scroll to top jika user sudah scroll > 320px
+      const el = mainRef.current;
+      const currentScroll = el
+        ? el.scrollTop
+        : typeof window !== "undefined"
+          ? window.scrollY
+          : 0;
+      setShowScrollTop(currentScroll > 320);
     };
 
     const el = mainRef.current;
-    if (!el) return;
-    el.addEventListener("scroll", handleScroll, { passive: true });
+    if (el) {
+      el.addEventListener("scroll", handleScroll, { passive: true });
+    }
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
     return () => {
-      el.removeEventListener("scroll", handleScroll);
+      if (el) el.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", handleScroll);
       clearTimeout(scrollTimeout);
     };
   }, []);
 
-  // Engine Animasi Pergeseran Lengkung 3D (60 FPS Hardware-Accelerated)
+  // 3. Engine Animasi Pergeseran Lengkung 3D
   useEffect(() => {
     let animationFrameId: number;
     let lastTime = performance.now();
     let progress = 0;
-    let currentSpeed = 0.42; // Kecepatan geser kartu per detik
+    let currentSpeed = 0.42;
     const totalItems = CAROUSEL_ITEMS.length;
     const halfItems = totalItems / 2;
 
@@ -218,7 +282,6 @@ export default function Home() {
       const dt = Math.min((now - lastTime) / 1000, 0.1);
       lastTime = now;
 
-      // Melambat halus saat kursor diarahkan ke area kartu
       const targetSpeed = isCarouselPausedRef.current ? 0.05 : 0.42;
       currentSpeed += (targetSpeed - currentSpeed) * Math.min(1, dt * 6);
       progress = (progress + currentSpeed * dt) % totalItems;
@@ -231,14 +294,12 @@ export default function Home() {
         const el = cardRefs.current[i];
         if (!el) continue;
 
-        // Hitung posisi relatif tiap kartu terhadap titik tengah [-6, +6]
         let offset = (i - progress) % totalItems;
         if (offset < -halfItems) offset += totalItems;
         if (offset > halfItems) offset -= totalItems;
 
         const absOffset = Math.abs(offset);
 
-        // Sembunyikan kartu yang berada di luar jangkauan pandang lengkungan
         if (absOffset > 3.7) {
           el.style.opacity = "0";
           el.style.pointerEvents = "none";
@@ -246,7 +307,6 @@ export default function Home() {
           continue;
         }
 
-        // Geometri Lengkungan 3D (Panorama Melengkung seperti Referensi)
         const translateX = offset * spacingX;
         const translateY = Math.pow(absOffset, 1.75) * (isMobile ? 6 : 10);
         const translateZ = -Math.pow(absOffset, 1.3) * (isMobile ? 38 : 60);
@@ -273,15 +333,14 @@ export default function Home() {
   return (
     <main
       ref={mainRef}
-      className="relative w-full flex flex-col font-sans overflow-x-hidden h-screen overflow-y-scroll snap-y snap-mandatory snap-container"
+      className="relative w-full flex flex-col font-sans overflow-x-hidden h-screen overflow-y-scroll"
     >
       {/* ========================================= */}
-      {/* SMART NAVBAR (Tanpa Efek Blur / Background) */}
+      {/* SMART NAVBAR */}
       {/* ========================================= */}
       <nav
-        className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6 bg-transparent transition-transform duration-300 ease-in-out ${
-          isScrolling ? "-translate-y-full" : "translate-y-0"
-        }`}
+        className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6 bg-transparent transition-transform duration-300 ease-in-out ${isScrolling ? "-translate-y-full" : "translate-y-0"
+          }`}
       >
         <div className="flex items-center gap-2">
           <Image
@@ -292,44 +351,49 @@ export default function Home() {
             className="object-cover rounded-full drop-shadow-md"
           />
           <div className="flex items-center font-semibold tracking-wide drop-shadow-md">
-            <div className="text-xl text-[#297add]">Jak</div>
-            <div className="text-xl text-white">Match</div>
+            <div className="text-xl text-white">JakMatch</div>
           </div>
         </div>
 
         <div className="hidden md:flex items-center bg-[#E5E5E5] rounded-full p-1.5 shadow-sm">
           <Link
-            href="#home"
-            className="bg-black text-white px-5 py-1.5 rounded-full text-xs font-bold tracking-wide"
+            href="/#home"
+            className={`px-5 py-1.5 rounded-full text-xs font-bold tracking-wide transition-all duration-300 ${activeSection === "home"
+              ? "bg-black text-white shadow-md"
+              : "text-gray-900 hover:bg-black/5"
+              }`}
           >
-            HOME
+            BERANDA
           </Link>
           <Link
-            href="#features"
-            className="text-gray-900 px-5 py-1.5 rounded-full text-xs font-bold hover:bg-black/5 transition tracking-wide"
+            href="/#features"
+            className={`px-5 py-1.5 rounded-full text-xs font-bold tracking-wide transition-all duration-300 ${activeSection === "features"
+              ? "bg-black text-white shadow-md"
+              : "text-gray-900 hover:bg-black/5"
+              }`}
           >
-            SERVICES
+            FITUR
           </Link>
           <Link
-            href="/about"
+            href="/#peta"
             className="text-gray-900 px-5 py-1.5 rounded-full text-xs font-bold hover:bg-black/5 transition tracking-wide"
           >
-            ABOUTUS
+            PETA LANDING
           </Link>
         </div>
 
         <div className="flex items-center gap-3 sm:gap-6">
           <Link
             href="/login"
-            className="relative text-white text-sm font-medium transition drop-shadow-md after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-white hover:after:w-full after:transition-all after:duration-300"
+            className="relative text-white text-sm font-medium transition drop-shadow-md after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-[#CDFC56] hover:after:w-full after:transition-all after:duration-300"
           >
-            Log In
+            Masuk
           </Link>
           <Link
             href="/register"
             className="bg-black text-white px-4 sm:px-6 py-2 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg"
           >
-            Sign up
+            Buat Akun
           </Link>
         </div>
       </nav>
@@ -338,7 +402,7 @@ export default function Home() {
       {/* SECTION 1: HERO & 3D CURVED DASHBOARD     */}
       {/* ========================================= */}
       <section
-        className="relative isolate h-screen w-full flex flex-col justify-between shrink-0 snap-start overflow-hidden"
+        className="relative isolate h-screen w-full flex flex-col justify-between shrink-0 overflow-hidden"
         id="home"
       >
         <div className="absolute inset-0 -z-10 bg-black">
@@ -351,26 +415,25 @@ export default function Home() {
           >
             <source src="/assets/landing-bg.mp4" type="video/mp4" />
           </video>
-          {/* Gradasi penyatu dari akhir Section 1 menuju warna langit Section berikutnya */}
+          {/* Gradasi penyatu */}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-b from-transparent via-[#09489c]/65 to-[#0773BC]" />
         </div>
 
         {/* Hero Copywriting & CTA */}
-        <div className="flex flex-col items-center justify-center text-center mt-24 sm:mt-28 lg:mt-28 px-4 z-20">
+        <div className="flex flex-col items-center justify-center text-center mt-28 sm:mt-32 lg:mt-36 px-4 z-20">
           <motion.h1
             {...createAos("up", 0)}
             className="text-[clamp(2rem,4vw,3.75rem)] leading-[1.05] font-bold text-white mb-4 sm:mb-5 tracking-wide drop-shadow-sm"
           >
-            Live where you feel
-            <br className="hidden sm:block" /> comfortable.
+            Temukan Hunian Idealmu, <br className="hidden sm:block" /> dengan
+            <span className="text-[#CDFC56]">JakMatch</span>
           </motion.h1>
 
           <motion.p
             {...createAos("up", 0.1)}
             className="text-white max-w-2xl text-sm sm:text-base lg:text-lg mb-5 sm:mb-6 font-medium drop-shadow-md"
           >
-            We provide this platform for those of you who are struggling to find
-            a comfortable place to live.
+            Platform rekomendasi lokasi hunian dan ekspansi bisnis berbasis data
           </motion.p>
 
           <motion.div
@@ -378,21 +441,21 @@ export default function Home() {
             className="flex flex-wrap justify-center gap-3 sm:gap-4"
           >
             <Link
-              href="/register"
+              href="/login"
               className="bg-black text-white px-8 py-3 rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-lg"
             >
-              Sign Up
+              Masuk
             </Link>
             <Link
-              href="/dashboard"
+              href="/register"
               className="bg-white text-black px-8 py-3 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-lg"
             >
-              Try Free Now
+              Buat Akun
             </Link>
           </motion.div>
         </div>
 
-        {/* 3D CURVED DASHBOARD SHOWCASE (Menggantikan Kotak Putih Statis) */}
+        {/* 3D CURVED DASHBOARD SHOWCASE */}
         <motion.div
           {...createAos("zoom", 0.25)}
           onMouseEnter={() => {
@@ -411,7 +474,7 @@ export default function Home() {
               transformStyle: "preserve-3d",
             }}
           >
-           {CAROUSEL_ITEMS.map((item, idx) => (
+            {CAROUSEL_ITEMS.map((item, idx) => (
               <div
                 key={`${item.id}-${idx}`}
                 ref={(el) => {
@@ -449,10 +512,10 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Caption & Rating Bintang ala Referensi Gambar */}
+          {/* Caption & Rating Bintang */}
           <div className="mt-2 sm:mt-3 flex flex-col items-center text-center z-20">
             <p className="text-xs sm:text-sm font-semibold text-white tracking-wide drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]">
-              Integrated Spatial Analytics across 42 Districts in DKI Jakarta
+              4.9/5.0 (1.2K+ Reviews)
             </p>
             <div className="flex items-center gap-1.5 mt-1">
               {[...Array(5)].map((_, i) => (
@@ -476,7 +539,7 @@ export default function Home() {
       <section
         id="features"
         aria-label="Fitur Unggulan JakMatch"
-        className="relative isolate min-h-dvh w-full flex flex-col justify-between pt-24 sm:pt-28 lg:pt-24 pb-6 sm:pb-8 px-4 sm:px-6 lg:px-12 xl:px-16 overflow-x-hidden shrink-0 snap-start bg-gradient-to-b from-[#0773BC] to-[#81D8FF] text-white"
+        className="relative isolate min-h-dvh w-full flex flex-col justify-between pt-24 sm:pt-28 lg:pt-24 pb-6 sm:pb-8 px-4 sm:px-6 lg:px-12 xl:px-16 overflow-x-hidden shrink-0 bg-gradient-to-b from-[#0773BC] to-[#81D8FF] text-white"
       >
         {/* Dekorasi Ambient Cahaya & Grid Spasial */}
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
@@ -495,15 +558,6 @@ export default function Home() {
         <div className="w-full max-w-7xl mx-auto my-auto py-4 lg:py-2 z-10">
           {/* Header Section Fitur Unggulan */}
           <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-8 lg:mb-6">
-            <motion.div
-              {...createAos("up", 0)}
-              className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1 rounded-full bg-white/10 border border-white/15 text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-[#CDFC56] mb-2.5"
-            >
-              <span className="w-2 h-2 rounded-full bg-[#CDFC56] animate-pulse shrink-0" />
-              <span className="truncate">
-                Core Location Intelligence • Fitur Unggulan
-              </span>
-            </motion.div>
 
             <motion.h2
               {...createAos("up", 0.08)}
@@ -523,129 +577,161 @@ export default function Home() {
             </motion.p>
           </div>
 
-          {/* Grid 4 Kartu Fitur Unggulan */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5">
+          {/* Grid 4 Kartu Fitur Unggulan (Gaya White Card Peta Interaktif + Custom Icon) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
             {/* Fitur 01 */}
             <motion.div
               {...createAos("up", 0.1)}
-              className="group relative rounded-2xl sm:rounded-3xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/10 hover:border-[#CDFC56]/50 p-4 sm:p-5 transition-all duration-300 flex flex-col justify-between"
+              className="group relative bg-white rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.18)] text-black border border-neutral-100 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
-                  <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[#CDFC56] text-neutral-950 flex items-center justify-center font-mono font-black text-xs sm:text-sm shadow-md shrink-0">
-                    01
-                  </span>
-                  <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/10 text-neutral-300 text-right">
+                <div className="flex items-center justify-between gap-2 pb-3.5 mb-3.5 border-b border-neutral-100">
+                  <div className="relative w-11 h-11 rounded-2xl bg-neutral-50 border border-neutral-200/80 p-1.5 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <Image
+                      src="/assets/feature-icon-1.png"
+                      alt="Personal Priority & Smart Budget Lock"
+                      fill
+                      sizes="44px"
+                      className="object-contain p-1"
+                    />
+                  </div>
+                  <span className="text-[10px] font-mono font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md border border-neutral-200 bg-neutral-50 text-neutral-600 text-right">
                     3 Persona Profil
                   </span>
                 </div>
-                <h3 className="text-sm sm:text-base lg:text-[17px] font-bold text-[#FFFFFF] group-hover:text-[#161616] transition-colors leading-snug">
+                <h3 className="text-base lg:text-[17px] font-bold tracking-tight text-black group-hover:text-[#CDFC56] transition-colors leading-snug">
                   Personal Priority & Smart Budget Lock
                 </h3>
-                <p className="text-xs text-neutral-300 leading-relaxed mt-1.5 sm:mt-2">
+                <p className="text-xs text-neutral-600 leading-relaxed mt-2">
                   Kustomisasi bobot prioritas 0%–100% sesuai profil{" "}
-                  <strong className="text-white">
+                  <strong className="font-semibold text-black">
                     Mahasiswa/Pekerja, Keluarga, atau UMKM
                   </strong>{" "}
                   dengan fitur pengunci plafon anggaran otomatis.
                 </p>
               </div>
-              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-neutral-400">
-                <span>Kalkulasi Real-Time</span>
-                <span className="text-[#CDFC56] font-bold">Custom Bobot</span>
+              <div className="mt-4 pt-3.5 border-t border-neutral-100 flex items-center justify-between text-[11px] font-mono">
+                <span className="text-neutral-400">Kalkulasi Real-Time</span>
+                <span className="px-2 py-0.5 rounded-md bg-black text-white font-bold">
+                  Custom Bobot
+                </span>
               </div>
             </motion.div>
 
             {/* Fitur 02 */}
             <motion.div
               {...createAos("up", 0.18)}
-              className="group relative rounded-2xl sm:rounded-3xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/10 hover:border-[#CDFC56]/50 p-4 sm:p-5 transition-all duration-300 flex flex-col justify-between"
+              className="group relative bg-white rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.18)] text-black border border-neutral-100 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
-                  <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[#297add] text-white flex items-center justify-center font-mono font-black text-xs sm:text-sm shadow-md shrink-0">
-                    02
-                  </span>
-                  <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/10 text-neutral-300 text-right">
+                <div className="flex items-center justify-between gap-2 pb-3.5 mb-3.5 border-b border-neutral-100">
+                  <div className="relative w-11 h-11 rounded-2xl bg-neutral-50 border border-neutral-200/80 p-1.5 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <Image
+                      src="/assets/feature-icon-2.png"
+                      alt="Multi-Mode Spatial & Radar Analytics"
+                      fill
+                      sizes="44px"
+                      className="object-contain p-1"
+                    />
+                  </div>
+                  <span className="text-[10px] font-mono font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md border border-neutral-200 bg-neutral-50 text-neutral-600 text-right">
                     42 Kecamatan BPS
                   </span>
                 </div>
-                <h3 className="text-sm sm:text-base lg:text-[17px] font-bold text-white group-hover:text-[#CDFC56] transition-colors leading-snug">
+                <h3 className="text-base lg:text-[17px] font-bold tracking-tight text-black group-hover:text-[#CDFC56] transition-colors leading-snug">
                   Multi-Mode Spatial & Radar Analytics
                 </h3>
-                <p className="text-xs text-neutral-300 leading-relaxed mt-1.5 sm:mt-2">
+                <p className="text-xs text-neutral-600 leading-relaxed mt-2">
                   Bandingkan Top 3 kecamatan lewat visualisasi{" "}
-                  <strong className="text-white">
-                    Kurva Area, Radar Poligon, & Mode Vertikal
+                  <strong className="font-semibold text-black">
+                    Kurva Area & Mode Vertikal
                   </strong>{" "}
                   lengkap dengan indikator keterjangkauan{" "}
                   <em>Traffic Light</em>.
                 </p>
               </div>
-              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-neutral-400">
-                <span>5 Indikator Vital</span>
-                <span className="text-[#297add] font-bold">Skala 0–100</span>
+              <div className="mt-4 pt-3.5 border-t border-neutral-100 flex items-center justify-between text-[11px] font-mono">
+                <span className="text-neutral-400">5 Indikator Vital</span>
+                <span className="px-2 py-0.5 rounded-md bg-black text-white font-bold">
+                  Skala 0–100
+                </span>
               </div>
             </motion.div>
 
             {/* Fitur 03 */}
             <motion.div
               {...createAos("up", 0.26)}
-              className="group relative rounded-2xl sm:rounded-3xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/10 hover:border-[#CDFC56]/50 p-4 sm:p-5 transition-all duration-300 flex flex-col justify-between"
+              className="group relative bg-white rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.18)] text-black border border-neutral-100 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
-                  <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[#CDFC56] text-neutral-950 flex items-center justify-center font-mono font-black text-xs sm:text-sm shadow-md shrink-0">
-                    03
-                  </span>
-                  <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/10 text-neutral-300 text-right">
+                <div className="flex items-center justify-between gap-2 pb-3.5 mb-3.5 border-b border-neutral-100">
+                  <div className="relative w-11 h-11 rounded-2xl bg-neutral-50 border border-neutral-200/80 p-1.5 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <Image
+                      src="/assets/feature-icon-3.png"
+                      alt="Generative AI Trade-Off Synthesizer"
+                      fill
+                      sizes="44px"
+                      className="object-contain p-1"
+                    />
+                  </div>
+                  <span className="text-[10px] font-mono font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md border border-neutral-200 bg-neutral-50 text-neutral-600 text-right">
                     Anti-Halusinasi
                   </span>
                 </div>
-                <h3 className="text-sm sm:text-base lg:text-[17px] font-bold text-white group-hover:text-[#CDFC56] transition-colors leading-snug">
+                <h3 className="text-base lg:text-[17px] font-bold tracking-tight text-black group-hover:text-[#CDFC56] transition-colors leading-snug">
                   Generative AI Trade-Off Synthesizer
                 </h3>
-                <p className="text-xs text-neutral-300 leading-relaxed mt-1.5 sm:mt-2">
+                <p className="text-xs text-neutral-600 leading-relaxed mt-2">
                   Konsultan AI berbasis{" "}
-                  <strong className="text-white">
+                  <strong className="font-semibold text-black">
                     Strict JSON-Locked Prompt
                   </strong>{" "}
                   yang menganalisis kompromi harga sewa vs kualitas fasilitas
                   secara dinamis dan personal.
                 </p>
               </div>
-              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-neutral-400">
-                <span>Streaming Insight</span>
-                <span className="text-[#CDFC56] font-bold">100% Akurat</span>
+              <div className="mt-4 pt-3.5 border-t border-neutral-100 flex items-center justify-between text-[11px] font-mono">
+                <span className="text-neutral-400">Streaming Insight</span>
+                <span className="px-2 py-0.5 rounded-md bg-black text-white font-bold">
+                  100% Akurat
+                </span>
               </div>
             </motion.div>
 
             {/* Fitur 04 */}
             <motion.div
               {...createAos("up", 0.34)}
-              className="group relative rounded-2xl sm:rounded-3xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/10 hover:border-[#CDFC56]/50 p-4 sm:p-5 transition-all duration-300 flex flex-col justify-between"
+              className="group relative bg-white rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.18)] text-black border border-neutral-100 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
-                  <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[#297add] text-white flex items-center justify-center font-mono font-black text-xs sm:text-sm shadow-md shrink-0">
-                    04
-                  </span>
-                  <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/10 text-neutral-300 text-right">
+                <div className="flex items-center justify-between gap-2 pb-3.5 mb-3.5 border-b border-neutral-100">
+                  <div className="relative w-11 h-11 rounded-2xl bg-neutral-50 border border-neutral-200/80 p-1.5 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <Image
+                      src="/assets/feature-icon-4.png"
+                      alt="Ekspor Laporan Resmi & Riwayat Akun"
+                      fill
+                      sizes="44px"
+                      className="object-contain p-1"
+                    />
+                  </div>
+                  <span className="text-[10px] font-mono font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md border border-neutral-200 bg-neutral-50 text-neutral-600 text-right">
                     Cloud & PNG Export
                   </span>
                 </div>
-                <h3 className="text-sm sm:text-base lg:text-[17px] font-bold text-white group-hover:text-[#CDFC56] transition-colors leading-snug">
+                <h3 className="text-base lg:text-[17px] font-bold tracking-tight text-black group-hover:text-[#CDFC56] transition-colors leading-snug">
                   Ekspor Laporan Resmi & Riwayat Akun
                 </h3>
-                <p className="text-xs text-neutral-300 leading-relaxed mt-1.5 sm:mt-2">
+                <p className="text-xs text-neutral-600 leading-relaxed mt-2">
                   Unduh kanvas laporan keputusan beresolusi tinggi dalam format{" "}
-                  <strong className="text-white">PNG sekali klik</strong> serta
-                  simpan riwayat simulasi ke database akun Anda.
+                  <strong className="font-semibold text-black">
+                    PNG sekali klik
+                  </strong>{" "}
+                  serta simpan riwayat simulasi ke database akun Anda.
                 </p>
               </div>
-              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-neutral-400">
-                <span>Arsip Permanen</span>
-                <span className="text-[#297add] font-bold">
+              <div className="mt-4 pt-3.5 border-t border-neutral-100 flex items-center justify-between text-[11px] font-mono">
+                <span className="text-neutral-400">Arsip Permanen</span>
+                <span className="px-2 py-0.5 rounded-md bg-black text-white font-bold">
                   Siap Presentasi
                 </span>
               </div>
@@ -690,8 +776,8 @@ export default function Home() {
       {/* SECTION 4: INTERACTIVE MAP (COMPACT CARD) */}
       {/* ========================================= */}
       <section
-        className="relative isolate h-screen w-full flex items-center justify-center pt-24 sm:pt-28 pb-10 sm:pb-12 px-4 sm:px-6 lg:px-12 xl:px-16 overflow-hidden shrink-0 snap-start"
-        id="abouts"
+        className="relative isolate min-h-dvh w-full flex items-center justify-center py-24 sm:py-28 px-3 sm:px-6 lg:px-12 xl:px-16 overflow-hidden shrink-0"
+        id="peta"
       >
         {/* Background Padang Rumput & Langit + Gradasi Penyatu */}
         <div className="absolute inset-0 -z-20">
@@ -705,7 +791,7 @@ export default function Home() {
           <div className="pointer-events-none absolute inset-x-0 top-0 h-52 bg-gradient-to-b from-[#81D8FF] via-[#257ce0]/50 to-transparent" />
         </div>
 
-        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 xl:gap-12 items-center z-10">
+        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 lg:gap-8 xl:gap-12 items-center z-10">
           {/* KIRI: PETA INTERAKTIF & FILTER CEPAT (7 Kolom) */}
           <motion.div
             {...createAos("left", 0)}
@@ -741,9 +827,9 @@ export default function Home() {
                         points={region.points}
                         fill={
                           isSelected
-                            ? "rgba(249, 115, 22, 0.85)"
+                            ? "#CDFC56" // Warna hijau toska saat di-klik (tetap)
                             : isHovered
-                              ? "rgba(37, 99, 235, 0.70)"
+                              ? region.hoverColor // MENGGUNAKAN WARNA PREMIUM BARU TIAP REGION
                               : "rgba(255, 255, 255, 0.01)"
                         }
                         stroke={
@@ -759,11 +845,12 @@ export default function Home() {
                         x={region.labelPos.x}
                         y={region.labelPos.y}
                         textAnchor="middle"
-                        className={`text-[21px] font-bold tracking-tight pointer-events-none transition-colors duration-200 ${
-                          isSelected || isHovered
-                            ? "fill-white"
-                            : "fill-neutral-800/80"
-                        }`}
+                        className={`text-[21px] font-bold tracking-tight pointer-events-none transition-colors duration-200 ${isSelected
+                            ? "fill-neutral-950" // Teks jadi hitam pekat agar terbaca di atas warna terang #CDFC56
+                            : isHovered
+                              ? "fill-white"
+                              : "fill-neutral-800/80"
+                          }`}
                       >
                         {region.name.replace("Jakarta ", "Jak. ")}
                       </text>
@@ -774,18 +861,17 @@ export default function Home() {
             </div>
 
             {/* Navigasi Pill Minimalis di Bawah Peta */}
-            <div className="flex flex-wrap justify-center gap-1 bg-white/85 backdrop-blur-sm p-1 rounded-full shadow-md mt-1">
+            <div className="flex w-full max-w-[450px] lg:max-w-[520px] xl:max-w-[600px] flex-wrap justify-center gap-1 bg-white/85 backdrop-blur-sm p-1 rounded-2xl shadow-md mt-2">
               {JAKARTA_REGIONS.map((region) => {
                 const active = selectedRegion.id === region.id;
                 return (
                   <button
                     key={region.id}
                     onClick={() => setSelectedRegion(region)}
-                    className={`px-3.5 py-1 rounded-full text-[11px] font-bold tracking-wide transition-all ${
-                      active
+                    className={`px-3 py-2 sm:px-3.5 sm:py-1.5 rounded-full text-[11px] font-bold tracking-wide transition-all ${active
                         ? "bg-black text-white shadow-sm"
                         : "text-neutral-700 hover:bg-black/5"
-                    }`}
+                      }`}
                   >
                     {region.name.replace("Jakarta ", "")}
                   </button>
@@ -806,10 +892,10 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.25, ease: "easeOut" }}
-                className="w-full max-w-[400px] lg:max-w-[460px] xl:max-w-[520px] bg-white rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.18)] text-black"
+                className="w-full max-w-[400px] lg:max-w-[460px] xl:max-w-[520px] bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.18)] text-black"
               >
                 {/* Meta Bar Atas */}
-                <div className="flex items-center justify-between text-[11px] font-mono text-neutral-400 pb-2.5 border-b border-neutral-100">
+                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[10px] sm:text-[11px] font-mono text-neutral-400 pb-2.5 border-b border-neutral-100">
                   <span>
                     REGION {selectedRegion.index} / 05 — {selectedRegion.code}
                   </span>
@@ -820,10 +906,10 @@ export default function Home() {
 
                 {/* Judul Wilayah & Deskripsi */}
                 <div className="mt-3">
-                  <h3 className="text-2xl font-bold tracking-tight text-black">
+                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-black">
                     {selectedRegion.name}
                   </h3>
-                  <p className="text-neutral-600 text-xs leading-relaxed mt-1.5">
+                  <p className="text-neutral-600 text-xs sm:text-sm leading-relaxed mt-1.5">
                     {selectedRegion.summary}
                   </p>
                 </div>
@@ -832,7 +918,7 @@ export default function Home() {
                 <div className="mt-4 pt-3.5 border-t border-neutral-100 space-y-2.5">
                   {selectedRegion.metrics.map((metric) => (
                     <div key={metric.label}>
-                      <div className="flex justify-between text-[11px] mb-1">
+                      <div className="flex justify-between gap-3 text-[11px] sm:text-xs mb-1">
                         <span className="font-medium text-neutral-600">
                           {metric.label}
                         </span>
@@ -870,7 +956,7 @@ export default function Home() {
                 </div>
 
                 {/* Footer Kartu: Harga & Tombol CTA */}
-                <div className="mt-4 pt-3.5 border-t border-neutral-100 flex items-center justify-between gap-3">
+                <div className="mt-4 pt-3.5 border-t border-neutral-100 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <span className="text-[10px] text-neutral-400 block">
                       Rata-rata Sewa / Bln
@@ -882,7 +968,7 @@ export default function Home() {
 
                   <Link
                     href="/dashboard"
-                    className="bg-black text-white px-4 py-2.5 rounded-xl text-xs font-bold tracking-wide hover:bg-neutral-800 transition flex items-center gap-1.5 shrink-0"
+                    className="bg-black text-white px-4 py-2.5 rounded-xl text-xs font-bold tracking-wide hover:bg-neutral-800 transition flex items-center justify-center gap-1.5 sm:shrink-0"
                   >
                     <span>Explore Area</span>
                     <svg
@@ -911,7 +997,7 @@ export default function Home() {
       {/* ========================================= */}
       <footer
         aria-label="Footer JakMatch"
-        className="relative isolate w-full bg-[#0B1526] text-white pt-12 sm:pt-16 pb-8 px-4 sm:px-6 lg:px-12 xl:px-16 shrink-0 snap-end border-t border-white/10 select-none overflow-hidden"
+        className="relative isolate w-full bg-[#0B1526] text-white pt-12 sm:pt-16 pb-8 px-4 sm:px-6 lg:px-12 xl:px-16 shrink-0 border-t border-white/10 select-none overflow-hidden"
       >
         {/* Aksen Cahaya Halus di Latar Footer */}
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
@@ -936,8 +1022,7 @@ export default function Home() {
                   className="rounded-full object-cover shadow-md group-hover:scale-105 transition-transform"
                 />
                 <div className="flex items-center text-xl font-extrabold tracking-tight">
-                  <span className="text-[#297add]">Jak</span>
-                  <span className="text-white">Match</span>
+                  <span className="text-white">JakMatch</span>
                 </div>
               </Link>
 
@@ -1006,7 +1091,7 @@ export default function Home() {
                     href="/dashboard"
                     className="hover:text-white hover:translate-x-0.5 inline-block transition-all"
                   >
-                    Parameter &amp; Bobot Prioritas
+                    Profile &amp; Prioritas
                   </Link>
                 </li>
                 <li>
@@ -1014,7 +1099,7 @@ export default function Home() {
                     href="/dashboard/komparasi"
                     className="hover:text-white hover:translate-x-0.5 inline-block transition-all"
                   >
-                    Komparasi Radar &amp; Finansial
+                    Komparasi &amp; Finansial
                   </Link>
                 </li>
                 <li>
@@ -1022,7 +1107,7 @@ export default function Home() {
                     href="/dashboard/analisis-ai"
                     className="hover:text-white hover:translate-x-0.5 inline-block transition-all"
                   >
-                    Konsultan AI Multimodal
+                    Konsultan AI
                   </Link>
                 </li>
                 <li>
@@ -1030,7 +1115,7 @@ export default function Home() {
                     href="/dashboard/riwayat"
                     className="hover:text-white hover:translate-x-0.5 inline-block transition-all"
                   >
-                    Riwayat Riset Tersimpan
+                    Riwayat
                   </Link>
                 </li>
               </ul>
@@ -1075,6 +1160,35 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* ========================================= */}
+      {/* FLOATING ACTION BUTTON: SCROLL TO TOP     */}
+      {/* ========================================= */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.6, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.6, y: 20 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50"
+          >
+            <button
+              type="button"
+              onClick={scrollToTop}
+              aria-label="Kembali ke halaman utama"
+              className="group relative flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-[#CDFC56] text-[#0B1526] shadow-[0_8px_30px_rgba(205,252,86,0.45)] hover:bg-[#b8e840] hover:shadow-[0_12px_36px_rgba(205,252,86,0.65)] border border-[#e4ffa1] transition-all duration-200 active:scale-90 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0773BC]/40"
+            >
+
+              {/* Icon Panah ke Atas dengan Animasi Hover */}
+              <ArrowUp
+                className="h-5 w-5 sm:h-6 sm:w-6 transition-transform duration-200 group-hover:-translate-y-1"
+                strokeWidth={2.75}
+              />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }

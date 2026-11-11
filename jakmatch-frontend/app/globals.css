@@ -24,12 +24,3 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
-
-/* Sembunyikan scrollbar pada wadah snap-scroll (rapih, seperti app) */
-.snap-container {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.snap-container::-webkit-scrollbar {
-  display: none;
-}

@@ -495,7 +495,7 @@ export default function LoginPage() {
                   ? "Memproses..."
                   : isForgotOpen
                     ? "Kirim Tautan Pemulihan"
-                    : "Masuk ke Ruang Kerja"}
+                    : "Masuk ke Dashboard"}
               </span>
 
               <span

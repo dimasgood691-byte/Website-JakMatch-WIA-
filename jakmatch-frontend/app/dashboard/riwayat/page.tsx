@@ -38,23 +38,26 @@ export default function RiwayatTersimpanPage() {
     };
 
     return (
-        <div className="space-y-5 sm:space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4">
-                <div className="space-y-1">
-                    <h2 className="text-lg sm:text-2xl font-extrabold text-white drop-shadow-xs leading-tight">
-                        Riwayat Analisis Lokasi Tersimpan
-                    </h2>
-                    <p className="text-xs sm:text-sm text-white/90 leading-relaxed">
-                        Klik pada kartu riwayat untuk melihat grafik detail atau buka
-                        kembali simulasi ke ruang kerja aktif.
-                    </p>
-                </div>
+        <div className="min-w-0 space-y-4 sm:space-y-5">
+            <div className="flex min-w-0 flex-col gap-3 sm:gap-4 lg:flex-row lg:items-stretch">
+                <header className="relative min-w-0 flex-1 overflow-hidden rounded-xl border border-white/25 bg-white/10 px-3.5 py-3.5 shadow-[0_8px_20px_rgba(7,55,100,0.1)] backdrop-blur-md sm:px-4 sm:py-4">
+                    <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[#CDFC56]/15 blur-2xl" />
+                    <div className="relative min-w-0 space-y-1">
+                        <h2 className="text-base font-extrabold leading-snug text-white sm:text-lg lg:text-xl">
+                            Riwayat Analisis Lokasi Tersimpan
+                        </h2>
+                        <p className="max-w-2xl text-[11px] leading-relaxed text-white/85 sm:text-xs">
+                            Klik kartu riwayat untuk melihat grafik detail atau buka
+                            kembali simulasi ke ruang kerja aktif.
+                        </p>
+                    </div>
+                </header>
 
                 <Link
                     href="/dashboard"
-                    className="group w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-extrabold bg-[#CDFC56] hover:bg-[#b8e840] hover:border-[#9fcf2d] hover:shadow-[0_8px_20px_rgba(7,115,188,0.2)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CDFC56] focus-visible:ring-offset-2 border border-[#b6e838] transition-all duration-200 ease-out shrink-0 shadow-xs"
+                    className="group inline-flex min-h-10 w-fit shrink-0 items-center justify-center gap-1.5 self-center whitespace-nowrap rounded-lg border border-[#b6e838] bg-[#CDFC56] px-4 py-2.5 text-xs font-extrabold shadow-xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-[#9fcf2d] hover:bg-[#b8e840] hover:shadow-[0_8px_20px_rgba(7,115,188,0.2)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CDFC56] focus-visible:ring-offset-2"
                 >
-                    <ArrowLeft className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-0.5" />
+                    <ArrowLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-0.5" />
                     <span>Buat Riset Baru</span>
                 </Link>
             </div>
@@ -205,7 +208,7 @@ export default function RiwayatTersimpanPage() {
                                                         <strong className="text-slate-800">
                                                             {formatRupiah(d.estimatedCost)}/bln
                                                         </strong>{" "}
-                                                        ({d.isUnderBudget ? "🟢 Underbudget" : "🔴 Overbudget"})
+                                                        ({d.isUnderBudget ? "Underbudget" : "Overbudget"})
                                                     </p>
                                                 )}
                                             </div>

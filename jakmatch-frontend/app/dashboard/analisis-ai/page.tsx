@@ -491,33 +491,40 @@ export default function AnalisisAiPage() {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-4 sm:space-y-5">
             {/* Header & Aksi Fase 8 */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                    <h2 className="text-xl sm:text-2xl font-extrabold text-white drop-shadow-xs mt-1.5">
-                        Konsultan AI Interaktif & Laporan Keputusan
-                    </h2>
-                    <p className="text-xs sm:text-sm text-white/90 mt-0.5">
-                        Diskusikan rekomendasi wilayah, unggah foto properti atau dokumen
-                        kontrak/brosur, lalu unduh laporan resmi.
-                    </p>
-                </div>
+            <div className="flex min-w-0 flex-col gap-3 sm:gap-4 lg:flex-row lg:items-stretch">
+                <header className="relative min-w-0 flex-1 overflow-hidden rounded-xl border border-white/25 bg-white/10 px-3.5 py-3.5 shadow-[0_8px_20px_rgba(7,55,100,0.1)] backdrop-blur-md sm:px-4 sm:py-4">
+                    <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[#CDFC56]/15 blur-2xl" />
+                    <div className="relative flex min-w-0 items-start">
+                        <div className="min-w-0">
+                            <div className="min-w-0 space-y-1">
+                                <h2 className="text-base font-extrabold leading-snug text-white sm:text-lg lg:text-xl">
+                                    Konsultan AI Interaktif & Laporan Keputusan
+                                </h2>
+                                <p className="max-w-2xl text-[11px] leading-relaxed text-white/85 sm:text-xs">
+                                    Diskusikan rekomendasi wilayah, unggah foto properti atau dokumen
+                                    kontrak/brosur, lalu unduh laporan resmi.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </header>
 
-                <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                <div className="grid w-full grid-cols-1 gap-2 min-[480px]:grid-cols-2 xl:w-auto xl:grid-cols-3 xl:content-center">
                     <Link
                         href="/dashboard/komparasi"
-                        className="group inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-700 hover:bg-[#CDFC56] hover:border-[#b6e838] hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CDFC56] focus-visible:ring-offset-2 transition-all duration-200 ease-out"
+                        className="group inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-lg border border-[#b6e838] bg-[#CDFC56] px-3 py-2 text-[11px] font-extrabold text-[#161616] shadow-[0_6px_20px_rgba(7,115,188,0.18)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-[#b8e840] hover:bg-[#b8e840] hover:shadow-[0_10px_26px_rgba(7,115,188,0.28)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CDFC56] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0773BC] sm:px-4 sm:text-xs"
                     >
-                        <ArrowLeft className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-0.5" />
-                        Kembali ke Grafik
+                        <ArrowLeft className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover:-translate-x-0.5" />
+                        <span className="truncate">Kembali ke Grafik</span>
                     </Link>
 
                     <button
                         type="button"
                         onClick={handleSaveComparison}
                         disabled={isSaving || topThreeDistricts.length === 0}
-                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-800 hover:bg-[#CDFC56] hover:border-[#b6e838] hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CDFC56] focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:scale-100 disabled:hover:shadow-none transition-all duration-200 ease-out cursor-pointer"
+                        className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[11px] font-bold text-slate-800 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-[#b6e838] hover:bg-[#CDFC56] hover:shadow-sm active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CDFC56] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:scale-100 disabled:hover:shadow-none cursor-pointer sm:px-4 sm:text-xs"
                     >
                         <BookmarkCheck className="w-4 h-4 text-slate-900" />
                         {isSaving ? "Menyimpan..." : "Simpan Hasil Riset"}
@@ -527,13 +534,13 @@ export default function AnalisisAiPage() {
                         type="button"
                         onClick={handleDownloadPNG}
                         disabled={isExporting || topThreeDistricts.length === 0}
-                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-extrabold bg-[#CDFC56] hover:bg-[#b8e840] text-slate-900 shadow-xs disabled:opacity-50 transition cursor-pointer"
+                        className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-[#CDFC56] px-3 py-2 text-[11px] font-extrabold text-slate-900 shadow-xs transition hover:bg-[#b8e840] disabled:opacity-50 cursor-pointer sm:px-4 sm:text-xs"
                     >
                         <Download className="w-4 h-4" />
                         {isExporting ? "Mengekspor PNG..." : "Unduh Laporan (PNG)"}
                     </button>
                     {exportError && (
-                        <p role="alert" className="w-full text-xs text-red-100">
+                        <p role="alert" className="col-span-full w-full text-center text-xs text-red-100">
                             {exportError}
                         </p>
                     )}
@@ -544,14 +551,14 @@ export default function AnalisisAiPage() {
             {/* BAGIAN 1: KANVAS LAPORAN RESMI (UNTUK UNDUH PNG)      */}
             {/* ===================================================== */}
             <div
-                className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 lg:p-8 shadow-xs space-y-6"
+                className="min-w-0 space-y-4 rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs sm:space-y-5 sm:p-5 lg:p-6"
             >
-                <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
-                    <div>
-                        <h3 className="text-lg font-extrabold text-slate-900 mt-1">
+                <div className="flex min-w-0 flex-col gap-2 border-b border-slate-100 pb-3 sm:flex-row sm:items-start sm:justify-between sm:pb-4">
+                    <div className="min-w-0">
+                        <h3 className="text-base font-extrabold leading-snug text-slate-900 sm:text-lg">
                             Rekomendasi Wilayah: {appliedProfileConfig.label}
                         </h3>
-                        <p className="text-xs text-slate-500">
+                        <p className="mt-1 break-words text-[11px] leading-relaxed text-slate-500 sm:text-xs">
                             Cakupan: {appliedConfig.region} • Target Aset:{" "}
                             {appliedProfileConfig.assetLabel} • Anggaran:{" "}
                             {formatRupiah(appliedConfig.budget)}/bln
@@ -560,7 +567,7 @@ export default function AnalisisAiPage() {
                 </div>
 
                 {/* Ringkasan Kesimpulan AI di dalam Kanvas Laporan */}
-                <div className="p-4 rounded-xl bg-[#CDFC56]/20 border border-[#b8e840] space-y-1.5">
+                <div className="space-y-1.5 rounded-lg border border-[#b8e840] bg-[#CDFC56]/20 p-3 sm:rounded-xl sm:p-4">
                     <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-900">
                         Kesimpulan Konsultan AI ({appliedProfileConfig.personaBadge})
                     </span>
@@ -572,39 +579,39 @@ export default function AnalisisAiPage() {
 
                 {/* Ringkasan Grafik & 3 Kartu Pemenang di dalam Kanvas Laporan */}
                 {topThreeDistricts.length > 0 && (
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center pt-1">
-                        <div className="lg:col-span-7 border border-slate-100 rounded-2xl p-4">
+                    <div className="grid min-w-0 grid-cols-1 items-start gap-4 pt-1 lg:grid-cols-12 lg:gap-5">
+                        <div className="min-w-0 rounded-xl border border-slate-100 p-2.5 sm:p-3 lg:col-span-7">
                             <InteractiveRadarChart
                                 districts={topThreeDistricts}
                                 axes={appliedProfileConfig.sliders}
                             />
                         </div>
 
-                        <div className="lg:col-span-5 space-y-3">
+                        <div className="min-w-0 space-y-2.5 lg:col-span-5">
                             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
                                 Ringkasan Top 3 Kandidat Kecamatan
                             </h4>
                             {topThreeDistricts.map((d, idx) => (
                                 <div
                                     key={d.id}
-                                    className={`p-4 rounded-xl border flex items-center justify-between ${idx === 0
+                                    className={`flex min-w-0 items-center justify-between gap-2.5 rounded-lg border p-3 sm:p-3.5 ${idx === 0
                                         ? "bg-[#CDFC56]/30 border-[#b5e43b]"
                                         : "bg-slate-50 border-slate-200/80"
                                         }`}
                                 >
-                                    <div>
+                                    <div className="min-w-0">
                                         <span className="inline-block px-2 py-0.5 rounded bg-[#CDFC56] text-slate-900 text-[10px] font-extrabold uppercase">
                                             Peringkat #{idx + 1} • {d.city_region}
                                         </span>
-                                        <p className="text-sm font-extrabold text-slate-900 mt-1">
+                                        <p className="mt-1 truncate text-xs font-extrabold text-slate-900 sm:text-sm">
                                             {d.district_name}
                                         </p>
-                                        <p className="text-xs text-slate-500">
+                                        <p className="text-[10px] leading-relaxed text-slate-500 sm:text-xs">
                                             Estimasi: {formatRupiah(d.estimatedCost)}/bln (
                                             {d.isUnderBudget ? "Underbudget" : "Overbudget"})
                                         </p>
                                     </div>
-                                    <div className="text-right">
+                                    <div className="shrink-0 text-right">
                                         <span className="block text-[10px] text-slate-400">
                                             Skor
                                         </span>
@@ -820,9 +827,8 @@ export default function AnalisisAiPage() {
                                         flex: 1,
                                         minWidth: 0,
                                         padding: 20,
-                                        border: `1px solid ${
-                                            isTopChoice ? "#B8E840" : "#E2E8F0"
-                                        }`,
+                                        border: `1px solid ${isTopChoice ? "#B8E840" : "#E2E8F0"
+                                            }`,
                                         borderRadius: 16,
                                         backgroundColor: isTopChoice
                                             ? "#F7FCEB"
@@ -986,20 +992,20 @@ export default function AnalisisAiPage() {
                     setIsDraggingOver(false);
                     void processSelectedFiles(e.dataTransfer.files);
                 }}
-                className={`bg-white rounded-2xl border transition-all shadow-sm overflow-hidden flex flex-col ${isDraggingOver
+                className={`min-w-0 overflow-hidden rounded-xl border bg-white shadow-sm flex flex-col transition-all ${isDraggingOver
                     ? "border-slate-900 ring-4 ring-[#CDFC56]"
                     : "border-slate-200"
                     }`}
             >
                 {/* Header Chatbot */}
-                <div className="px-5 py-4 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#CDFC56] text-slate-900 flex items-center justify-center shadow-xs shrink-0">
-                            <Bot className="w-5 h-5" />
+                <div className="flex flex-col gap-3 bg-slate-900 px-3.5 py-3.5 text-white sm:flex-row sm:items-center sm:justify-between sm:px-4">
+                    <div className="flex min-w-0 items-start gap-2.5 sm:items-center sm:gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#CDFC56] text-slate-900 shadow-xs">
+                            <Bot className="h-4 w-4" />
                         </div>
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <h3 className="text-sm font-extrabold text-white">
+                        <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-1.5">
+                                <h3 className="text-xs font-extrabold text-white sm:text-sm">
                                     JakMatch AI Spatial Assistant
                                 </h3>
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#CDFC56] text-slate-900">
@@ -1007,19 +1013,15 @@ export default function AnalisisAiPage() {
                                     Ready
                                 </span>
                             </div>
-                            <p className="text-[11px] text-slate-300">
-                                {appliedProfileConfig.personaBadge} • Bisa tanya jawab,
-                                kirim foto kos/ruko, atau lampirkan file dokumen
-                            </p>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="grid w-full grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:w-auto sm:shrink-0">
                         {chatMessages.length > 0 && (
                             <button
                                 type="button"
                                 onClick={() => setChatMessages([])}
-                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-[11px] font-bold bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
+                                className="inline-flex min-h-9 items-center justify-center gap-1 rounded-lg bg-white/10 px-3 py-1.5 text-[10px] font-bold text-white transition hover:bg-white/20 cursor-pointer sm:text-[11px]"
                             >
                                 <MessageSquarePlus className="w-3.5 h-3.5" />
                                 Bersihkan Chat
@@ -1029,7 +1031,7 @@ export default function AnalisisAiPage() {
                             type="button"
                             onClick={() => triggerAiSynthesis()}
                             disabled={isAiStreaming || topThreeDistricts.length === 0}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-extrabold bg-[#CDFC56] text-slate-900 hover:bg-[#b8e840] disabled:opacity-50 transition cursor-pointer"
+                            className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-[#CDFC56] px-3 py-1.5 text-[10px] font-extrabold text-slate-900 transition hover:bg-[#b8e840] disabled:opacity-50 cursor-pointer sm:text-[11px]"
                         >
                             <RefreshCw
                                 className={`w-3.5 h-3.5 ${isAiStreaming ? "animate-spin" : ""
@@ -1041,7 +1043,7 @@ export default function AnalisisAiPage() {
                 </div>
 
                 {/* Bar Konteks Variabel Dinamis yang Aktif */}
-                <div className="px-5 py-2.5 bg-slate-50 border-b border-slate-200/80 flex flex-wrap items-center gap-2 text-[11px]">
+                <div className="flex flex-wrap items-center gap-1.5 border-b border-slate-200/80 bg-slate-50 px-3.5 py-2.5 text-[10px] sm:gap-2 sm:px-4 sm:text-[11px]">
                     <span className="font-bold text-slate-500">
                         Konteks Aktif:
                     </span>
@@ -1062,14 +1064,14 @@ export default function AnalisisAiPage() {
                 </div>
 
                 {/* Ruang Percakapan (Chat Feed) */}
-                <div className="p-4 sm:p-5 space-y-4 max-h-[460px] overflow-y-auto bg-[#F8FAFC]/60">
+                <div className="max-h-[min(60dvh,520px)] space-y-3 overflow-y-auto bg-[#F8FAFC]/60 p-3 sm:max-h-[520px] sm:space-y-4 sm:p-4">
                     {/* Pesan Pertama: Analisis Otomatis Trade-Off Top 3 */}
                     <div className="flex items-start gap-3">
                         <div className="w-8 h-8 rounded-xl bg-[#CDFC56] border border-[#b2e23b] flex items-center justify-center text-slate-900 shrink-0 mt-0.5">
                             <Sparkles className="w-4 h-4" />
                         </div>
-                        <div className="flex-1 min-w-0 bg-white rounded-2xl rounded-tl-xs border border-slate-200 p-4 shadow-2xs space-y-2">
-                            <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0 flex-1 space-y-2 rounded-xl rounded-tl-xs border border-slate-200 bg-white p-3 shadow-2xs sm:p-4">
+                            <div className="flex flex-wrap items-start justify-between gap-1.5">
                                 <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-900 bg-[#CDFC56] px-2 py-0.5 rounded">
                                     Ringkasan Utama Top 3 Kecamatan
                                 </span>
@@ -1202,23 +1204,23 @@ export default function AnalisisAiPage() {
                 </div>
 
                 {/* Bar Saran Pertanyaan Cepat */}
-                <div className="px-4 sm:px-5 py-2.5 bg-white border-t border-slate-100 flex items-center gap-2 overflow-x-auto">
-                    <span className="text-[11px] font-bold text-slate-400 shrink-0">
+                <div className="flex flex-wrap items-center gap-1.5 border-t border-slate-100 bg-white px-3 py-2.5 sm:gap-2 sm:px-4">
+                    <span className="mr-0.5 text-[10px] font-bold text-slate-400 sm:text-[11px]">
                         Tanya Cepat:
                     </span>
-                        {
-                            dynamicQuickPrompts.map((q) => (
-                                <button
-                                    key={q}
-                                    type="button"
-                                    disabled={isChatLoading}
-                                    onClick={() => void handleSendMessage(q)}
-                                    className="px-3 py-1 rounded-full text-[11px] font-bold bg-slate-100 hover:bg-[#CDFC56] text-slate-700 hover:text-slate-900 transition cursor-pointer shrink-0 disabled:opacity-50"
-                                >
-                                    {q}
-                                </button>
-                            ))
-                        }
+                    {
+                        dynamicQuickPrompts.map((q) => (
+                            <button
+                                key={q}
+                                type="button"
+                                disabled={isChatLoading}
+                                onClick={() => void handleSendMessage(q)}
+                                className="max-w-full rounded-full bg-slate-100 px-2.5 py-1.5 text-left text-[10px] font-bold leading-snug text-slate-700 transition hover:bg-[#CDFC56] hover:text-slate-900 cursor-pointer disabled:opacity-50 sm:px-3 sm:py-1 sm:text-[11px]"
+                            >
+                                {q}
+                            </button>
+                        ))
+                    }
                 </div>
 
                 {/* Pratinjau Lampiran Foto / File Sebelum Dikirim */}
@@ -1273,7 +1275,7 @@ export default function AnalisisAiPage() {
                         e.preventDefault();
                         void handleSendMessage();
                     }}
-                    className="p-3 sm:p-4 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-end gap-2.5"
+                    className="flex flex-col items-stretch gap-2 border-t border-slate-200 bg-white p-3 sm:flex-row sm:items-end sm:gap-2.5 sm:p-4"
                 >
                     {/* Input Tersembunyi untuk Foto & Dokumen */}
                     <input
@@ -1299,12 +1301,12 @@ export default function AnalisisAiPage() {
                         }}
                     />
 
-                    <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="flex shrink-0 items-center gap-1.5 sm:order-1">
                         <button
                             type="button"
                             onClick={() => photoInputRef.current?.click()}
                             title="Unggah Foto Properti / Lingkungan"
-                            className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-[#CDFC56] text-slate-700 hover:text-slate-900 transition cursor-pointer"
+                            className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-slate-100 px-3 py-2 text-[11px] font-bold text-slate-700 transition hover:bg-[#CDFC56] hover:text-slate-900 cursor-pointer"
                         >
                             <ImagePlus className="w-4 h-4" />
                             <span className=" sm:inline">Foto</span>
@@ -1314,7 +1316,7 @@ export default function AnalisisAiPage() {
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
                             title="Lampirkan Dokumen / Brosur / CSV / PDF"
-                            className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-[#CDFC56] text-slate-700 hover:text-slate-900 transition cursor-pointer"
+                            className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-slate-100 px-3 py-2 text-[11px] font-bold text-slate-700 transition hover:bg-[#CDFC56] hover:text-slate-900 cursor-pointer"
                         >
                             <Paperclip className="w-4 h-4" />
                             <span className=" sm:inline">File</span>
@@ -1333,7 +1335,7 @@ export default function AnalisisAiPage() {
                             }
                         }}
                         placeholder="Ketik pertanyaan, tempel (paste) gambar, atau lampirkan foto kos/ruko & dokumen..."
-                        className="flex-1 min-h-[42px] max-h-28 resize-none rounded-xl border border-slate-200 bg-slate-50 focus:bg-white px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#CDFC56] focus:border-slate-900 transition"
+                        className="min-h-[42px] max-h-28 w-full min-w-0 flex-1 resize-none rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 transition focus:border-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#CDFC56] sm:order-2 sm:text-sm"
                     />
 
                     <button
@@ -1343,7 +1345,7 @@ export default function AnalisisAiPage() {
                             (!inputPrompt.trim() &&
                                 pendingAttachments.length === 0)
                         }
-                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold bg-[#CDFC56] hover:bg-[#b8e840] text-slate-900 disabled:opacity-50 transition cursor-pointer shrink-0 shadow-xs"
+                        className="inline-flex min-h-10 w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-[#CDFC56] px-5 py-2.5 text-xs font-extrabold text-slate-900 shadow-xs transition hover:bg-[#b8e840] disabled:opacity-50 cursor-pointer sm:order-3 sm:w-auto"
                     >
                         <Send className="w-4 h-4" />
                         <span>Kirim</span>
@@ -1351,10 +1353,10 @@ export default function AnalisisAiPage() {
                 </form>
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-stretch sm:justify-end">
                 <Link
                     href="/dashboard/riwayat"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#CDFC56] text-slate-900 text-xs font-extrabold hover:bg-[#b8e840] transition"
+                    className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-[#CDFC56] px-4 py-2 text-[11px] font-extrabold text-slate-900 transition hover:bg-[#b8e840] sm:w-auto sm:text-xs"
                 >
                     Lihat Daftar Riwayat Riset Tersimpan
                     <ArrowRight className="w-4 h-4" />

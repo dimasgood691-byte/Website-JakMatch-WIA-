@@ -290,28 +290,11 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
                 }
             });
         } else {
-            // Cek kompatibilitas key lama jika ada
-            try {
-                const rawLegacy =
-                    localStorage.getItem("session") || localStorage.getItem("user");
-                const rawToken =
-                    localStorage.getItem("jakmatch_token") ||
-                    localStorage.getItem("token") ||
-                    "";
-                if (rawLegacy) {
-                    const parsed = JSON.parse(rawLegacy);
-                    setActiveUser({
-                        id: parsed?.user?.id || parsed?.id || "",
-                        email:
-                            parsed?.user?.email ||
-                            parsed?.email ||
-                            "anonymous@gmail.com",
-                        token: parsed?.token || rawToken,
-                    });
-                }
-            } catch {
-                // Abaikan jika sesi kosong
-            }
+            // Jika sesi tidak valid atau tidak ditemukan, segera alihkan ke /login
+            void clearSession().then(() => {
+                router.replace("/login");
+            });
+            return;
         }
 
         // Sinkronisasi lintas tab ketika user logout di tab lain

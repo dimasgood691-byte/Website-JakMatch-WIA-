@@ -21,8 +21,8 @@ import { formatRupiah } from "./config";
 const NAV_ITEMS = [
     {
         step: "01",
-        shortTitle: "Parameter",
-        label: "Parameter & prioritas",
+        shortTitle: "Profile",
+        label: "Profile & prioritas",
         desc: "Profil, wilayah, budget & bobot slider",
         href: "/dashboard",
         icon: SlidersHorizontal,
@@ -38,7 +38,7 @@ const NAV_ITEMS = [
     {
         step: "03",
         shortTitle: "Konsultan AI",
-        label: "Konsultasi AI & laporan",
+        label: "Konsultasi AI",
         desc: "Analisis kompromi AI & ekspor PNG",
         href: "/dashboard/analisis-ai",
         icon: Sparkles,
@@ -46,7 +46,7 @@ const NAV_ITEMS = [
     {
         step: "04",
         shortTitle: "Riwayat",
-        label: "Riwayat tersimpan",
+        label: "Riwayat",
         desc: "Arsip hasil riset wilayah akun",
         href: "/dashboard/riwayat",
         icon: History,
@@ -97,9 +97,6 @@ function SidebarPanel({
                         <h1 className="text-base xl:text-lg font-extrabold text-slate-900 tracking-tight leading-tight">
                             JakMatch
                         </h1>
-                        <span className="mt-0.5 inline-block text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-[#CDFC56] text-slate-900 truncate max-w-[160px]">
-                            {personaBadge}
-                        </span>
                     </div>
                 </Link>
 
@@ -203,7 +200,7 @@ function SidebarPanel({
             <div className="shrink-0 px-4 py-3.5 border-t border-slate-100 bg-white space-y-2">
                 <div className="px-0.5">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none">
-                        Akun Terautentikasi
+                        Email akun anda :
                     </p>
                     <p className="text-xs font-bold text-slate-800 truncate mt-1">
                         {userEmail}
@@ -219,7 +216,7 @@ function SidebarPanel({
                         className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3.5 rounded-xl text-xs font-extrabold bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200/70 transition cursor-pointer"
                     >
                         <LogOut className="w-3.5 h-3.5" />
-                        <span>Sign out</span>
+                        <span>Keluar</span>
                     </button>
                 </div>
             </div>
@@ -280,9 +277,6 @@ export default function Sidebar() {
                         <span className="text-sm font-extrabold text-slate-900 block leading-none">
                             JakMatch
                         </span>
-                        <span className="inline-block mt-1 text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-[#CDFC56] text-slate-900 truncate max-w-[135px] sm:max-w-none">
-                            {currentProfileConfig.personaBadge}
-                        </span>
                     </div>
                 </Link>
 
@@ -296,6 +290,8 @@ export default function Sidebar() {
                     <button
                         type="button"
                         aria-label="Toggle Menu"
+                        aria-expanded={mobileOpen}
+                        aria-controls="mobile-sidebar-drawer"
                         onClick={() => setMobileOpen(!mobileOpen)}
                         className="p-2 rounded-xl bg-[#CDFC56] hover:bg-[#b8e840] text-slate-900 font-bold shadow-2xs transition cursor-pointer"
                     >
@@ -325,28 +321,45 @@ export default function Sidebar() {
             </aside>
 
             {/* Drawer Sidebar Overlay untuk Mobile & Tablet */}
-            {mobileOpen && (
-                <div className="lg:hidden fixed inset-0 z-50 flex">
-                    <div className="w-72 max-w-[84vw] h-dvh shadow-2xl animate-in slide-in-from-left duration-200">
-                        <SidebarPanel
-                            pathname={pathname}
-                            personaBadge={currentProfileConfig.personaBadge}
-                            districtsCount={allDistricts.length}
-                            region={appliedConfig.region}
-                            budget={appliedConfig.budget}
-                            topDistrictName={topDistrictName}
-                            hasUnappliedChanges={hasUnappliedChanges}
-                            userEmail={activeUser.email}
-                            onCloseMobile={() => setMobileOpen(false)}
-                            onLogout={handleLogout}
-                        />
-                    </div>
-                    <div
-                        className="flex-1 bg-slate-950/50 backdrop-blur-xs"
-                        onClick={() => setMobileOpen(false)}
+            <div
+                id="mobile-sidebar-drawer"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Menu navigasi"
+                aria-hidden={!mobileOpen}
+                inert={!mobileOpen}
+                className={`lg:hidden fixed inset-0 z-50 flex transition-[visibility] duration-300 ${
+                    mobileOpen
+                        ? "visible delay-0"
+                        : "invisible delay-300"
+                }`}
+            >
+                <div
+                    className={`h-dvh w-72 max-w-[84vw] shadow-2xl transition-transform duration-300 ease-in-out motion-reduce:transition-none ${
+                        mobileOpen ? "translate-x-0" : "-translate-x-full"
+                    }`}
+                >
+                    <SidebarPanel
+                        pathname={pathname}
+                        personaBadge={currentProfileConfig.personaBadge}
+                        districtsCount={allDistricts.length}
+                        region={appliedConfig.region}
+                        budget={appliedConfig.budget}
+                        topDistrictName={topDistrictName}
+                        hasUnappliedChanges={hasUnappliedChanges}
+                        userEmail={activeUser.email}
+                        onCloseMobile={() => setMobileOpen(false)}
+                        onLogout={handleLogout}
                     />
                 </div>
-            )}
+                <button
+                    type="button"
+                    aria-label="Tutup menu"
+                    tabIndex={mobileOpen ? 0 : -1}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex-1 border-0 bg-transparent"
+                />
+            </div>
 
             {/* Bottom Navigation Bar untuk Pengalaman Mobile */}
             <nav
