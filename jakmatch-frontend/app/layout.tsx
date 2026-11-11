@@ -13,17 +13,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "JakMatch",
-  description: "-",
+  title: "JakMatch — Sistem Pendukung Keputusan Lokasi DKI Jakarta",
+  description:
+    "Platform cerdas berbasis data untuk rekomendasi lokasi hunian dan ekspansi bisnis di DKI Jakarta.",
   icons: {
-    icon: "/assets/logo-jakmatch.png?v=2",
+    icon: [
+      { url: "/assets/logo-jakmatch.png?v=3", type: "image/png" },
+    ],
+    shortcut: "/assets/logo-jakmatch.png?v=3",
+    apple: "/assets/logo-jakmatch.png?v=3",
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html
-      lang="en"
+      lang="id"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
