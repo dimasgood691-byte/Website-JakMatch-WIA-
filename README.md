@@ -138,3 +138,6 @@ npm run dev
 - ✅ **Antarmuka Pengguna (UI/UX):** Pembuatan *Landing Page*, halaman *Register*, *Login*, dan *Dashboard* yang responsif.
 - ✅ **Penyempurnaan Analisis AI:** Pembaruan alur analisis dan endpoint agar hasil analisis lebih terintegrasi dengan data wilayah.
 - ✅ **Pengujian Integrasi:** Verifikasi alur autentikasi, analisis wilayah, komparasi, dan penyimpanan riwayat dari frontend hingga backend.
+
+## Demo Project :
+https://website-jak-match-wia.vercel.app/
